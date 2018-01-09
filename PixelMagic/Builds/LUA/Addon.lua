@@ -1,8 +1,6 @@
 -- Configurable Variables
 local size = 1;	-- this is the size of the "pixels" at the top of the screen that will show stuff, currently 5x5 because its easier to see and debug with
 
-
-
 ---Tables
 local npcDetect = {PlatesOn = 0,enemiesPlate = 0, activeUnitPlates = {}, npcCountFrame = nil}
 local EquipmentManger = {
@@ -150,11 +148,15 @@ local Spec = { Id ={
     [267] ="Incinerate"}
 }
 
--- Actual Addon Code below
+local index = GetCurrentResolution();
+local currentResolution = select(index, GetScreenResolutions());  -- this will return a value in the format 1920x1080
+local resWidth, resHeight = strsplit("x", currentResolution, 2)
+local scale = GetScreenWidth() / resWidth 
 
 local parent = CreateFrame("frame", "Recount", UIParent)
 parent:SetSize(55 * size, 20 * size);  -- Width, Height
 parent:SetPoint("TOPLEFT", 0, 0)
+parent:SetScale(scale) 
 parent:RegisterEvent("ADDON_LOADED")
 parent:RegisterEvent("NAME_PLATE_UNIT_ADDED")
 parent:RegisterEvent("PLAYER_ENTERING_WORLD")

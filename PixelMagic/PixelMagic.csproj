@@ -337,7 +337,6 @@
     <None Include="LUA\Addon.lua">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="packages.config" />
     <None Include="Resources\Refresh2_16x16.png" />
     <None Include="Resources\PageSetup_16x16.png" />
     <None Include="Resources\Project_16x16.png" />
