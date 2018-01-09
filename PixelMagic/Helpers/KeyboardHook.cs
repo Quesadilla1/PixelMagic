@@ -91,7 +91,7 @@ namespace PixelMagic.Helpers
 
             // register the hot key.
             if (!RegisterHotKey(_window.Handle, _currentId, (uint)modifier, (uint)key))
-                throw new InvalidOperationException("Couldn’t register the hot key.");
+                Log.WriteNoTime("Couldn’t register the hot key.", System.Drawing.Color.Red);
         }
 
         /// <summary>
@@ -146,7 +146,7 @@ namespace PixelMagic.Helpers
 
         public static ModifierKeys StartRotationModifierKey => toModifier(ConfigFile.ReadValue("Hotkeys", "cmbStartRotationModifierKey"));
 
-        public static ModifierKeys StopRotationModifierKey => toModifier(ConfigFile.ReadValue("Hotkeys", "cmbStopRotationModifierKey"));
+        public static ModifierKeys StopRotationModifierKey => toModifier(ConfigFile.ReadValue("Hotkeys", "cmbStartRotationModifierKey"));
 
         public static ModifierKeys SingleTargetModifierKey => toModifier(ConfigFile.ReadValue("Hotkeys", "cmbSingleTargetModifierKey"));
 
@@ -154,7 +154,7 @@ namespace PixelMagic.Helpers
 
         public static Keys StartRotationKey => toKey(ConfigFile.ReadValue("Hotkeys", "cmbStartRotationKey"));
 
-        public static Keys StopRotationKey => toKey(ConfigFile.ReadValue("Hotkeys", "cmbStopRotationKey"));
+        public static Keys StopRotationKey => toKey(ConfigFile.ReadValue("Hotkeys", "cmbStartRotationKey"));
 
         public static Keys SingleTargetKey => toKey(ConfigFile.ReadValue("Hotkeys", "cmbSingleTargetKey"));
 
@@ -168,6 +168,7 @@ namespace PixelMagic.Helpers
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public enum ModifierKeys : uint
     {
+        None = 0,
         Alt = 1,
         Ctrl = 2,
         Shift = 4

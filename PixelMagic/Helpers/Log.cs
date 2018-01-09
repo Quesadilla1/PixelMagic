@@ -13,7 +13,6 @@ using System.Media;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
-// ReSharper disable UnusedAutoPropertyAccessor.Global
 
 namespace PixelMagic.Helpers
 {
@@ -34,9 +33,7 @@ namespace PixelMagic.Helpers
 
         private static string lastMessage;
 
-        public static int LineCount { get; private set; }
-
-        private static void SetDoubleBuffered(Control c)
+        private static void SetDoubleBuffered(IDisposable c)
         {
             //Taxes: Remote Desktop Connection and painting
             //http://blogs.msdn.com/oldnewthing/archive/2006/01/03/508694.aspx
@@ -53,10 +50,12 @@ namespace PixelMagic.Helpers
             if (!Directory.Exists(Application.StartupPath + "\\Logs\\" + DateTime.Now.ToString("yyyy-MMM")))
                 Directory.CreateDirectory(Application.StartupPath + "\\Logs\\" + DateTime.Now.ToString("yyyy-MMM"));
 
-            _sw = new StreamWriter(Application.StartupPath + "\\Logs\\" + DateTime.Now.ToString("yyyy-MMM") + "\\" + DateTime.Now.ToString("yyyy.MM.dd HH.mm.ss") + ".txt")
-            {
-                AutoFlush = true
-            };
+            _sw =
+                new StreamWriter(Application.StartupPath + "\\Logs\\" + DateTime.Now.ToString("yyyy-MMM") + "\\" +
+                                 DateTime.Now.ToString("yyyy.MM.dd HH.mm.ss") + ".txt")
+                {
+                    AutoFlush = true
+                };
 
             _rtbLogWindow = rtbLogWindow;
             _parent = parent;
@@ -171,7 +170,8 @@ namespace PixelMagic.Helpers
             }
             catch (Exception ex)
             {
-                if (ex.Message == "Index (zero based) must be greater than or equal to zero and less than the size of the argument list." ||
+                if (ex.Message ==
+                    "Index (zero based) must be greater than or equal to zero and less than the size of the argument list." ||
                     ex.Message == "Input string was not in a correct format.")
                 {
                     try
@@ -202,7 +202,7 @@ namespace PixelMagic.Helpers
             //lastMessage = text;
         }
 
-        internal static void WritePixelMagic(string text, Color c)
+        public static void WritePixelMagic(string text, Color c)
         {
             char[] delimiterChars = {' ', ',', '.', ':', '\t'};
             var words = text.Split(delimiterChars);
@@ -233,7 +233,7 @@ namespace PixelMagic.Helpers
 
         public static void Write(string text, Color c)
         {
-            if (text == lastMessage && text == "Rotation paused until WoW Window has focus again.") // We want to avoid spamming, so we dont display duplicate messages
+            if (text == lastMessage) // We want to avoid spamming, so we dont display duplicate messages
             {
                 return;
             }
@@ -255,7 +255,7 @@ namespace PixelMagic.Helpers
             }
             catch
             {
-
+                // ignored
             }
             lastMessage = text;
         }
@@ -281,7 +281,7 @@ namespace PixelMagic.Helpers
         }
 
         public static void Write(Color color, string format, params object[] args)
-        {
+        {            
             _parent.Invoke(
                 new Action(() =>
                 {
@@ -290,33 +290,28 @@ namespace PixelMagic.Helpers
                 }));
         }
 
+        public static void WriteLocal(string message)
+        {
+        }
+
         private static void InternalWrite(Color color, string text, bool noTime = false, bool lineFeed = true, bool noSound = false)
         {
             try
             {
-                if (color == Color.Red && ConfigFile.PlayErrorSounds)
-                {
-                    if (!noSound)
-                    {
-                        SystemSounds.Hand.Play();
-                    }
-                }
-
                 var rtb = _rtbLogWindow;
 
                 rtb.SuspendLayout();
 
-                // We remove the top 1000 lines from the textbox when we reach 2000 lines
-                // We are only doing this update @ 2000 lines to prevent flickering
-                // Flickering is not 100% removed but it is reduced to an acceptable level.
-
                 if (rtb.Lines.Length > 2000 && _clearHistory)
                 {
-                    rtb.Select(0, rtb.GetFirstCharIndexFromLine(rtb.Lines.Length - 1000));
-                    rtb.SelectedText = "";
+                    rtb.Clear();
                 }
 
-                LineCount = rtb.Lines.Length;
+                if (text.ToLower().Contains("http"))
+                {
+                    color = Color.Red;
+                    text = "[URL Links not permitted in Log Window, please keep these on your settings form.]";
+                }
 
                 rtb.SelectionStart = rtb.Text.Length;
                 rtb.SelectionLength = 0;
@@ -324,7 +319,7 @@ namespace PixelMagic.Helpers
                 if (!noTime)
                 {
                     rtb.SelectionColor = Color.Gray;
-                    rtb.AppendText($"[{DateTime.Now.ToString("HH:mm:ss")}] ");
+                    rtb.AppendText($"[{DateTime.UtcNow.AddHours(2).ToString("HH:mm:ss")}] ");
                 }
 
                 rtb.SelectionColor = color;

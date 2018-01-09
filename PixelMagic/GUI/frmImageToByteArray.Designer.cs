@@ -91,7 +91,7 @@
             // 
             this.picSample.Location = new System.Drawing.Point(12, 39);
             this.picSample.Name = "picSample";
-            this.picSample.Size = new System.Drawing.Size(400, 300);
+            this.picSample.Size = new System.Drawing.Size(440, 300);
             this.picSample.TabIndex = 3;
             this.picSample.TabStop = false;
             this.picSample.Click += new System.EventHandler(this.picSample_Click);
@@ -111,6 +111,7 @@
             this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Image To Byte Array";
+            this.Load += new System.EventHandler(this.frmImageToByteArray_Load);
             ((System.ComponentModel.ISupportInitialize)(this.picSample)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

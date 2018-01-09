@@ -6,6 +6,7 @@
 
 using System;
 using System.Windows.Forms;
+using PixelMagic.GUI.GUI;
 
 namespace PixelMagic.GUI
 {

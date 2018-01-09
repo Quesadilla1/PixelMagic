@@ -52,6 +52,22 @@ namespace PixelMagic.Helpers
             SendInput(1, ref mouseInput, Marshal.SizeOf(new INPUT()));
         }
 
+        public static void RightRelease()
+        {
+            var mouseInput = new INPUT { type = SendInputEventType.InputMouse };
+                        
+            mouseInput.mkhi.mi.dwFlags = MouseEventFlags.MOUSEEVENTF_RIGHTUP;
+            SendInput(1, ref mouseInput, Marshal.SizeOf(new INPUT()));            
+        }
+
+        public static void RightDown()
+        {
+            var mouseInput = new INPUT { type = SendInputEventType.InputMouse };
+
+            mouseInput.mkhi.mi.dwFlags = MouseEventFlags.MOUSEEVENTF_RIGHTDOWN;
+            SendInput(1, ref mouseInput, Marshal.SizeOf(new INPUT()));
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         private struct INPUT
         {

@@ -4,8 +4,6 @@
 //                                              //
 //////////////////////////////////////////////////
 
-// Icon Backlink: http://icons8.com/ (http://www.iconarchive.com/show/ios7-icons-by-icons8/Animals-Ant-icon.html)
-
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
@@ -13,64 +11,70 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Management;
+using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
-using Microsoft.CSharp;
+using PixelMagic.GUI.GUI;
 using PixelMagic.Helpers;
 using PixelMagic.Rotation;
+using static PixelMagic.Helpers.NativeMethods;
+using Microsoft.CSharp;
+using System.Linq;
 
-// ReSharper disable once CheckNamespace
+// ReSharper disable ConvertIfStatementToConditionalTernaryExpression
+// ReSharper disable InvertIf
+// ReSharper disable ConvertIfStatementToSwitchStatement
+// ReSharper disable CheckNamespace
+#pragma warning disable 618
+
 namespace PixelMagic.GUI
 {
     public partial class frmMain : Form
     {
         internal static CombatRoutine combatRoutine;
         private readonly Dictionary<int, string> classes;
-        private KeyboardHook hook;
 
-        private static string Exe_Version => File.GetLastWriteTime(System.Reflection.Assembly.GetEntryAssembly().Location).ToString("yyyy.MM.dd");
-        
         private readonly int LocalVersion = int.Parse(Application.ProductVersion.Split('.')[0]);
 
+        private Process _process;
+        private SelectWoWProcessToAttachTo frmSelect;
+        private KeyboardHook hook;
+        
         internal frmMain()
         {
+            AutoScale = false;
+            AutoScaleMode = AutoScaleMode.None;
+
             InitializeComponent();
 
             classes = new Dictionary<int, string>
             {
-                { 1, "Warrior"},
-                { 2, "Paladin"},
-                { 3, "Hunter"},
-                { 4, "Rogue"},
-                { 5, "Priest"},
-                { 6, "DeathKnight"},
-                { 7, "Shaman"},
-                { 8, "Mage"},
-                { 9, "Warlock"},
-                { 10, "Monk"},
-                { 11, "Druid"},
-                { 12, "DemonHunter"}
+                {1, "Warrior"},
+                {2, "Paladin"},
+                {3, "Hunter"},
+                {4, "Rogue"},
+                {5, "Priest"},
+                {6, "DeathKnight"},
+                {7, "Shaman"},
+                {8, "Mage"},
+                {9, "Warlock"},
+                {10, "Monk"},
+                {11, "Druid"},
+                {12, "DemonHunter"}
             };
         }
 
-        private static string OperatingSystem
+        // ReSharper disable once AssignNullToNotNullAttribute
+        private static string Exe_Version => File.GetLastWriteTime(Assembly.GetEntryAssembly().Location).ToString("yyyy.MM.dd");
+               
+        public Process process
         {
-            get
+            private get { return _process; }
+            set
             {
-                var result = string.Empty;
-
-                var moc = new ManagementObjectSearcher(@"SELECT * FROM Win32_OperatingSystem ");
-                foreach (var managementBaseObject in moc.Get())
-                {
-                    var o = (ManagementObject) managementBaseObject;
-                    var x64 = Environment.Is64BitOperatingSystem ? "(x64)" : "(x86)";
-                    result = $@"{o["Caption"]} {x64} Version {o["Version"]} SP {o["ServicePackMajorVersion"]}.{o["ServicePackMinorVersion"]}";
-                    break;
-                }
-
-                return result.Replace("Microsoft", "").Trim();
+                _process = value;
+                Log.Write("Process Id = " + value.Id);
             }
         }
 
@@ -78,13 +82,14 @@ namespace PixelMagic.GUI
         {
             toolStripStatusLabel1.Text = string.Format(toolStripStatusLabel1.Text, Exe_Version);
             toolStripStatusLabel3.Text = string.Format(toolStripStatusLabel3.Text, LocalVersion);
+            frmSelect = new SelectWoWProcessToAttachTo(this);
 
-            prgPlayerHealth.Value = 0;
-            prgPower.Value = 0;
-            prgTargetHealth.Value = 0;
+            txtPlayerHealth.Text = "0";
+            txtPlayerPower.Text = "0";
+            txtTargetHealth.Text = "0";
 
             // Its annoying as hell when people use incorrect culture info, this will force it to use the correct number and date formats.
-            var ci = new CultureInfo("en-ZA") { DateTimeFormat = {ShortDatePattern = "yyyy/MM/dd"}, NumberFormat = { NumberDecimalSeparator = ".", CurrencyDecimalSeparator = "." } };
+            var ci = new CultureInfo("en-ZA") {DateTimeFormat = {ShortDatePattern = "yyyy/MM/dd"}, NumberFormat = {NumberDecimalSeparator = ".", CurrencyDecimalSeparator = "."}};
             Thread.CurrentThread.CurrentCulture = ci;
             Thread.CurrentThread.CurrentUICulture = ci;
 
@@ -92,22 +97,240 @@ namespace PixelMagic.GUI
             Shown += FrmMain_Shown;
             Log.Initialize(rtbLog, this);
 
-            var checkForUpdates = new Thread(delegate() { checkForUpdatesToolStripMenuItem.PerformClick(); }) {IsBackground = true};
-            checkForUpdates.Start();
+            Log.WritePixelMagic("Welcome to MagicPixel developed by WiNiFiX", Color.Blue);
+            
+            float dx, dy;
 
-            Log.WritePixelMagic("Welcome to PixelMagic Premium Edition developed by WiNiFiX", Color.Blue);
-            Log.WriteNoTime("For support please visit: http://goo.gl/0AqNxv");
-            Log.WriteNoTime("To view a sample rotation see the file: " + Application.StartupPath + "\\Rotations\\Warrior\\Warrior.cs", Color.Gray);
-            Log.WriteNoTime("To find spell / buff id's in WoW use the addon http://mods.curse.com/addons/wow/spellid", Color.Gray);
-            Log.HorizontalLine = "-".PadLeft(158, '-');
+            var g = CreateGraphics();
+            try
+            {
+                dx = g.DpiX;
+                dy = g.DpiY;
+            }
+            finally
+            {
+                g.Dispose();
+            }
+
+            if (dx == dy && dx != 96)
+            {
+                Log.WriteNoTime($"DPI = {dx}");
+            }
+
+            if (dx != dy)
+            {
+                Log.WriteNoTime($"DPI (x, y) = ({dx},{dy})");
+                Log.WriteNoTime("Please ensure that DPI Scaling on X = DPI Scaling on Y Axis of monitor", Color.Red);
+            }
+            if (dx != 96)
+            {
+                Log.WriteNoTime("Please ensure that DPI Scaling is set to 96 DPI or 100%", Color.Red);
+            }
+                        
+            Log.Write("Current version: " + LocalVersion);
+            
+            Log.WriteNoTime("To view a sample rotation see the file: " + Application.StartupPath + "\\Rotations\\DemonHunter\\Vengeance.cs", Color.Gray);
+            
+            Log.WriteNoTime("Should you encounter rotation issues at low health ensure that flashy red screen is turned off in interface options.", Color.Green);
+
+            var processName = Process.GetCurrentProcess().ProcessName.ToUpper();
+
+            if (processName == "MagicPixel")
+            {
+                Log.WriteNoTime("It has been detected that you have not renamed 'MagicPixel.exe' this is not allowed.", Color.Red);
+            }
+
+            Log.HorizontalLine = "-".PadLeft(152, '-');
             Log.DrawHorizontalLine();
         }
 
-        private bool LoadProfile(string fileName)
+        private void FrmMain_Shown(object sender, EventArgs e)
+        {
+            try
+            {
+                ConfigFile.Initialize();
+                
+                var f = new frmLicenseAgreement();
+                f.ShowDialog();
+
+                if (!ConfigFile.LicenseAccepted)
+                    Close();
+
+                chkDisableOverlay.Checked = ConfigFile.DisableOverlay;
+                chkDisableOverlay_CheckedChanged(null, null);
+
+                //Log.Write(OperatingSystem);
+
+                if (GameDVR.IsAppCapturedEnabled || GameDVR.IsGameDVREnabled)
+                {
+                    var dialogResult = MessageBox.Show("Game DVR is currently ENABLED on this machine. Would you like to disable it? PixelMagic will NOT function correctly with it enabled.",
+                        "DisableGameDVR", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                    if (dialogResult == DialogResult.Yes)
+                    {
+                        GameDVR.SetAppCapturedEnabled(0);
+                        GameDVR.SetGameDVREnabled(0);
+                        MessageBox.Show("Game DVR has been disabled. A restart maybe required to take effect.", "PixelMagic", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        Log.Write("PixelMagic cannot run until GameDVR is disabled", Color.Red);
+                        return;
+                    }
+                }
+                else
+                {
+                    Log.Write("GameDVR is disabled in Xbox app", Color.Green);
+                }
+
+                var i = 0;
+                foreach (var screen in Screen.AllScreens)
+                {
+                    i++;
+                    Log.Write($"Screen [{i}] - depth: {screen.BitsPerPixel}bit - resolution: {screen.Bounds.Width}x{screen.Bounds.Height}");
+                }
+
+                foreach (var item in classes)
+                {
+                    if (!Directory.Exists(Application.StartupPath + "\\Rotations\\" + item.Value))
+                        Directory.CreateDirectory(Application.StartupPath + "\\Rotations\\" + item.Value);
+                }
+
+                nudPulse.Value = ConfigFile.Pulse;
+
+                //if (!Debugger.IsAttached)
+                //{
+                frmSelect.ShowDialog();
+                //}
+                //else
+                //{
+                //    process = Process.GetProcessesByName("Wow-64").FirstOrDefault();
+                //}
+
+                if (process == null)
+                {
+                    Close();
+                }
+
+                ReloadHotkeys();
+
+                WoW.Initialize(process);
+
+                Log.Write("WoW Path: " + WoW.InstallPath, Color.Gray);
+                Log.Write("AddOn Path: " + WoW.AddonPath, Color.Gray);
+
+                var hwnd = WoW.Process.MainWindowHandle;
+
+                var myRect = new Rectangle();
+
+                RECT rct;
+
+                if (!GetWindowRect(hwnd, out rct))
+                {
+                    MessageBox.Show("Unable to find wow resolution from exe, please ensure WoW is running.", "PixelMagic", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                myRect.X = rct.Left;
+                myRect.Y = rct.Top;
+                myRect.Width = rct.Right - rct.Left + 1;
+                myRect.Height = rct.Bottom - rct.Top + 1;
+
+                Log.Write($"Current WoW Resolution is '{myRect.Width - 1}x{myRect.Height - 1}'");
+
+                if (myRect.Width != 1921 || myRect.Height != 1081)
+                {
+                    if (myRect.Width == 2561)
+                    {
+                        Log.Write("You are not running an officially supported resolution", Color.OrangeRed);
+                        // Allow this res for Suitz he swears it works, if it breaks he will support you with it :P
+                    }
+                    else
+                    {
+                        MessageBox.Show("Please ensure you are running wow in 1920x1080 or 2560x1080 resolutions, others are not supported.", "PixelMagic", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        Log.Write($"Current WoW Resolution is '{myRect.Width - 1}x{myRect.Height - 1}' only 1920x1080 or 2560x1080 is supported", Color.Red);
+                    }
+                }
+
+                var mousePos = new Thread(delegate ()
+                {
+                    while (true)
+                    {
+                        Threads.UpdateTextBox(txtMouseXY, Cursor.Position.X + "," + Cursor.Position.Y);
+                        Thread.Sleep(10);
+                    }
+                    // ReSharper disable once FunctionNeverReturns
+                })
+                { IsBackground = true };
+                mousePos.Start();
+
+                Log.DrawHorizontalLine();
+                Log.Write("Please select a rotation to load from 'File' -> 'Load Rotation...'", Color.Green);
+                Log.Write("Please note that you can only start a bot, or setup the spellbook, once you have loaded a rotation", Color.Black);
+                Log.DrawHorizontalLine();
+
+                var lastRotation = ConfigFile.ReadValue("PixelMagic", "LastProfile");
+
+                if (!File.Exists(lastRotation)) return;
+
+                if (!LoadProfile(lastRotation))
+                {
+                    Log.Write("Failed to load profile, please select a valid file.", Color.Red);
+                }
+
+                // For testing only
+                if (!Debugger.IsAttached)
+                    // ReSharper disable once RedundantJumpStatement
+                    return;
+
+                //var rot = new WindwalkerMonk();
+                //rot.Load(this);
+                //combatRoutine = rot.combatRoutine;
+                //combatRoutine.FileName = Application.StartupPath + @"\Rotations\Monk\Monk-Windwalker-Mixo.cs";
+                //Log.Write("Successfully loaded combat routine: " + combatRoutine.Name, Color.Green);                
+                //if (SpellBook.Initialize(Application.StartupPath + @"\Rotations\Monk\Monk-Windwalker-Mixo.cs"))
+                //{
+                //    spellbookToolStripMenuItem.Enabled = true;                    
+                //    cmdStartBot.Enabled = true;
+                //    cmdStartBot.BackColor = Color.LightGreen;
+                //    cmdRotationSettings.Enabled = true;
+                //}
+                //else
+                //{
+                //    spellbookToolStripMenuItem.Enabled = false;                    
+                //    cmdStartBot.Enabled = false;
+                //    cmdStartBot.BackColor = Color.WhiteSmoke;
+                //}
+            }
+            catch (Exception ex)
+            {
+                Log.Write(ex.Message, Color.Red);
+            }
+        }
+
+        private bool LoadProfile(string fileName, bool reloadUI = true)
         {
             using (var sr = new StreamReader(fileName))
             {
                 var code = sr.ReadToEnd();
+
+                Log.Write($"Loading file [{fileName}]...", Color.Black);
+
+                //if (fileName.EndsWith(".enc"))
+                //{
+                //    Log.Write("Decrypting profile...", Color.Black);
+
+                //    try
+                //    {
+                //        code = Encryption.Decrypt(code);
+
+                //        Log.Write("Profile has been decrypted successfully", Color.Green);
+                //    }
+                //    catch (Exception ex)
+                //    {
+                //        Log.Write(ex.Message, Color.Red);
+                //    }
+                //}
 
                 if (code.Trim() == "")
                 {
@@ -115,34 +338,36 @@ namespace PixelMagic.GUI
                     return false;
                 }
 
-                if (fileName.EndsWith(".enc"))
+                if (code.ToLower().Contains("class detectkeypress"))
                 {
-                    Log.Write("Decrypting profile...", Color.Black);
-
-                    try
-                    {
-                        code = Encryption.Decrypt(code);
-
-                        Log.Write("Profile has been decrypted successfully", Color.Green);
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Write(ex.Message, Color.Red);
-                    }
+                    MessageBox.Show("DetectKeyPress is already built into PixelMagic, please dont re-create the wheel.", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
                 }
 
-                Log.Write($"Compiling profile [{fileName}]...", Color.Black);
+                if (code.ToLower().Contains("wow.speak("))
+                {
+                    MessageBox.Show("WoW.Speak() is no longer allowed in custom rotations.", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
+                }
+
+                if (code.Contains("System.IO"))
+                {
+                    MessageBox.Show("using System.IO; is no longer allowed in custom rotations, no IO is needed other than Config Saving which you can already do.", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
+                }
+
+                Log.Write($"Compiling file [{fileName}]...", Color.Black);
 
                 var provider = new CSharpCodeProvider();
                 var parameters = new CompilerParameters();
-
-                parameters.ReferencedAssemblies.Add("System.Windows.Forms.dll"); // For Windows Forms use
-                parameters.ReferencedAssemblies.Add("System.Drawing.dll"); // For System.Drawing.Point and System.Drawing.Color use
+                                
+                parameters.ReferencedAssemblies.Add("System.Windows.Forms.dll"); 
+                parameters.ReferencedAssemblies.Add("System.Drawing.dll"); 
                 parameters.ReferencedAssemblies.Add("System.Data.dll");
                 parameters.ReferencedAssemblies.Add("System.Xml.dll");
                 parameters.ReferencedAssemblies.Add("System.Linq.dll");
                 parameters.ReferencedAssemblies.Add("System.dll");
-                parameters.ReferencedAssemblies.Add("System.IO.dll");
+                parameters.ReferencedAssemblies.Add("System.Core.dll");
                 parameters.ReferencedAssemblies.Add("System.Threading.dll");
                 parameters.ReferencedAssemblies.Add(Application.ExecutablePath);
                 parameters.GenerateInMemory = true;
@@ -154,7 +379,7 @@ namespace PixelMagic.GUI
                 {
                     foreach (CompilerError error in results.Errors)
                     {
-                        Log.Write($"Error ({error.ErrorNumber}): {error.ErrorText}", Color.Red);
+                        Log.Write($"Error on line [{error.Line}] - ({error.ErrorNumber}): {error.ErrorText}", Color.Red);
                     }
 
                     return false;
@@ -167,28 +392,25 @@ namespace PixelMagic.GUI
                     if (t.IsClass)
                     {
                         var obj = Activator.CreateInstance(t);
-                        combatRoutine = (CombatRoutine)obj;
+                        combatRoutine = (CombatRoutine) obj;
 
                         combatRoutine.Load(this);
                         combatRoutine.FileName = fileName;
 
                         Log.Write("Successfully loaded combat routine: " + combatRoutine.Name, Color.Green);
 
-                        Overlay.showOverlay(new Point(20, 680));
-                 
-                        if (SpellBook.Initialize(fileName))
+                        if (SpellBook.Initialize(fileName, reloadUI))
                         {
                             spellbookToolStripMenuItem.Enabled = true;
-                            submitTicketToolStripMenuItem.Enabled = true;
 
                             cmdStartBot.Enabled = true;
                             cmdStartBot.BackColor = Color.LightGreen;
                             cmdRotationSettings.Enabled = true;
+
                             return true;
                         }
 
                         spellbookToolStripMenuItem.Enabled = false;
-                        submitTicketToolStripMenuItem.Enabled = false;
 
                         cmdStartBot.Enabled = false;
                         cmdStartBot.BackColor = Color.WhiteSmoke;
@@ -235,8 +457,6 @@ namespace PixelMagic.GUI
 
             MouseHook.MouseClick += MouseHook_MouseClick;
 
-            chkPlayErrorSounds.Checked = ConfigFile.PlayErrorSounds;
-
             if (ConfigFile.ReadValue("Hotkeys", "cmbStartRotationKey") != "")
             {
                 hook.RegisterHotKey(Keyboard.StartRotationModifierKey, Keyboard.StartRotationKey, "Start Rotation");
@@ -258,6 +478,9 @@ namespace PixelMagic.GUI
                 hook.RegisterHotKey(Helpers.ModifierKeys.Alt, Keys.A, "AOE Targets");
                 hook.RegisterHotKey(Helpers.ModifierKeys.Alt, Keys.C, "Single Target Cleave Targets");
             }
+
+            hook.RegisterHotKey(Helpers.ModifierKeys.Ctrl, Keys.F5, "Reload Rotation & UI");
+            hook.RegisterHotKey(Helpers.ModifierKeys.Ctrl, Keys.F6, "Reload Rotation");
         }
 
         private void MouseHook_MouseClick(object sender, MouseEventArgs e)
@@ -265,111 +488,21 @@ namespace PixelMagic.GUI
             txtMouseXYClick.Text = $"{e.X}, {e.Y}";
         }
 
-        private Process _process;
-
-        public Process process
-        {
-            get
-            {
-                return _process;
-            }
-            set
-            {
-                _process = value;
-                Log.Write("Process Id = " + value.Id);
-            }
-        }
-
-        private void FrmMain_Shown(object sender, EventArgs e)
-        {
-            try
-            {
-                ConfigFile.Initialize();
-                
-                Log.Write(OperatingSystem);
-
-                var i = 0;
-                foreach (var screen in Screen.AllScreens)
-                {
-                    i++;
-                    Log.Write($"Screen [{i}] - depth: {screen.BitsPerPixel}bit - resolution: {screen.Bounds.Width}x{screen.Bounds.Height}");
-                }
-                
-                foreach (var item in classes)
-                {
-                    if (!Directory.Exists(Application.StartupPath + "\\Rotations\\" + item.Value))
-                        Directory.CreateDirectory(Application.StartupPath + "\\Rotations\\" + item.Value);
-                }
-                
-                nudPulse.Value = ConfigFile.Pulse;
-
-                SelectWoWProcessToAttachTo f = new SelectWoWProcessToAttachTo(this);
-                f.ShowDialog();
-                
-                if (process == null)
-                {
-                    Close();
-                }
-
-                ReloadHotkeys();
-
-                WoW.Initialize(process);
-
-                Log.Write("WoW Path: " + WoW.InstallPath, Color.Gray);
-                Log.Write("AddOn Path: " + WoW.AddonPath, Color.Gray);
-
-                var mousePos = new Thread(delegate ()
-                {
-                    while (true)
-                    {
-                        Threads.UpdateTextBox(txtMouseXY, Cursor.Position.X + "," + Cursor.Position.Y);
-                        Thread.Sleep(10);
-                    }
-                    // ReSharper disable once FunctionNeverReturns
-                })
-                { IsBackground = true };
-                mousePos.Start();
-
-                Log.DrawHorizontalLine();
-                Log.Write("Please select a rotation to load from 'File' -> 'Load Rotation...'", Color.Green);
-                Log.Write("Please note that you can only start a bot, or setup the spellbook, once you have loaded a rotation", Color.Black);
-                Log.DrawHorizontalLine();
-
-                //// For testing only
-                //if (!Debugger.IsAttached || Environment.MachineName != "BRETT-PC")
-                //    return;
-
-                //var rot = new Warrior();
-                //rot.Load(this);
-                //combatRoutine = rot.combatRoutine;
-                //combatRoutine.FileName = Application.StartupPath + @"\Rotations\Warrior\Warrior.cs";
-                //Log.Write("Successfully loaded combat routine: " + combatRoutine.Name, Color.Green);
-                //Overlay.showOverlay(new Point(20, 680));
-                //if (SpellBook.Initialize(Application.StartupPath + @"\Rotations\Warrior\Warrior.cs"))
-                //{
-                //    spellbookToolStripMenuItem.Enabled = true;
-                //    submitTicketToolStripMenuItem.Enabled = true;
-                //    cmdStartBot.Enabled = true;
-                //    cmdStartBot.BackColor = Color.LightGreen;
-                //    cmdRotationSettings.Enabled = true;
-                //}
-                //else
-                //{
-                //    spellbookToolStripMenuItem.Enabled = false;
-                //    submitTicketToolStripMenuItem.Enabled = false;
-                //    cmdStartBot.Enabled = false;
-                //    cmdStartBot.BackColor = Color.WhiteSmoke;
-                //}
-            }
-            catch (Exception ex)
-            {
-                Log.Write(ex.Message, Color.Red);
-            }
-        }
+        
 
         private void Hook_KeyPressed(object sender, KeyPressedEventArgs e)
         {
             lblHotkeyInfo.Text = e.Modifier + " + " + e.Key;
+
+            if (e.Modifier == Helpers.ModifierKeys.Ctrl && e.Key == Keys.F5)
+            {
+                cmdReloadRotationAndUI_Click(null, null);
+            }
+
+            if (e.Modifier == Helpers.ModifierKeys.Ctrl && e.Key == Keys.F6)
+            {
+                cmdReloadRotation_Click(null, null);
+            }
 
             if (ConfigFile.ReadValue("Hotkeys", "cmbStartRotationKey") != "")
             {
@@ -403,7 +536,7 @@ namespace PixelMagic.GUI
                             combatRoutine.ChangeType(CombatRoutine.RotationType.SingleTargetCleave);
                             return;
                         }
-                        
+
                         combatRoutine.ChangeType(CombatRoutine.RotationType.SingleTarget);
                     }
                 }
@@ -431,7 +564,7 @@ namespace PixelMagic.GUI
                     }
                 }
             }
-            else  // If defaults are not setup, then use these as defaults
+            else // If defaults are not setup, then use these as defaults
             {
                 if (e.Modifier == Helpers.ModifierKeys.Ctrl)
                 {
@@ -472,24 +605,25 @@ namespace PixelMagic.GUI
             if (combatRoutine.State == CombatRoutine.RotationState.Stopped)
             {
                 combatRoutine.Start();
+                WoW.Speak("Start");
 
-                if (combatRoutine.State == CombatRoutine.RotationState.Running)
-                {
-                    cmdStartBot.Text = "Stop rotation";
-                    cmdStartBot.BackColor = Color.Salmon;
-                }
+                if (combatRoutine.State != CombatRoutine.RotationState.Running) return;
+
+                cmdStartBot.Text = "Stop rotation";
+                cmdStartBot.BackColor = Color.Salmon;
             }
             else
             {
+                WoW.Speak("Stop");
                 combatRoutine.Pause();
                 cmdStartBot.Text = "Start rotation";
-                cmdStartBot.BackColor = Color.LightGreen;                
+                cmdStartBot.BackColor = Color.LightGreen;
             }
         }
 
         private void cmdDonate_Click(object sender, EventArgs e)
         {
-            Process.Start("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=CPDNWHKSVWGKA");
+            Process.Start("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=SYQ299Z5DRWC4");
         }
 
         private void loadRotationToolStripMenuItem_Click(object sender, EventArgs e)
@@ -499,11 +633,7 @@ namespace PixelMagic.GUI
                 combatRoutine?.Pause();
             }
 
-            var fileBrowser = new OpenFileDialog
-            {
-                Filter = "CS (*.cs)|*.cs|ENC (*.enc)|*.enc",
-                InitialDirectory = Application.StartupPath + "\\Rotations"
-            };
+            var fileBrowser = new OpenFileDialog {Filter = "CS (*.cs)|*.cs|ENC (*.enc)|*.enc", InitialDirectory = Application.StartupPath + "\\Rotations"};
             var res = fileBrowser.ShowDialog();
 
             if (res == DialogResult.OK)
@@ -518,7 +648,7 @@ namespace PixelMagic.GUI
                     ConfigFile.WriteValue("PixelMagic", "LastProfile", fileBrowser.FileName);
                 }
             }
-        }        
+        }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -528,66 +658,6 @@ namespace PixelMagic.GUI
             }
 
             Application.Exit();
-        }
-
-        private void checkForUpdatesToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            // Check versions                               
-            Log.Write("Latest GitHub version: " + GitHubVersion);
-            Log.Write("Current version: " + LocalVersion);
-
-            if (GitHubVersion > LocalVersion)
-            {
-                Log.Write("Please note you are not running the latest version of the bot, please update it.", Color.Red);
-            }
-        }
-
-        private void encryptCombatRoutineToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (ConfigFile.LastRotation.EndsWith(".enc"))
-            {
-                Log.Write("The currently selected routine is already encrypted", Color.Red);
-                return;
-            }
-
-            if (ConfigFile.LastRotation != "")
-            {
-                try
-                {
-                    string rotationSource;
-
-                    using (var sr = new StreamReader(ConfigFile.LastRotation))
-                    {
-                        var contents = sr.ReadToEnd();
-
-                        var line1 = contents.Split('\r')[0].Trim();
-
-                        if (!line1.Contains("@"))
-                        {
-                            throw new Exception("You are not permitted to encrypt a combat routine if you have not yet specified an email address on the top line of the routine");
-                        }
-
-                        rotationSource = Encryption.Encrypt(contents);
-                    }
-
-                    using (var sw = new StreamWriter(ConfigFile.LastRotation.Replace(".cs", ".enc")))
-                    {
-                        sw.Write(rotationSource);
-                        sw.Flush();
-                    }
-
-                    Log.Write("File has beem encrypted successfully.", Color.Green);
-                    Log.Write("Encrypted name: " + ConfigFile.LastRotation.Replace(".cs", ".enc"), Color.Green);
-                }
-                catch (Exception ex)
-                {
-                    Log.Write(ex.Message, Color.Red);
-                }
-            }
-            else
-            {
-                Log.Write("Please load a rotation so that I know which rotation to encrypt.", Color.Red);
-            }
         }
 
         private void hotkeysToolStripMenuItem_Click(object sender, EventArgs e)
@@ -604,11 +674,6 @@ namespace PixelMagic.GUI
             f.ShowDialog();
         }
 
-        private void chkPlayErrorSounds_CheckedChanged(object sender, EventArgs e)
-        {
-            ConfigFile.PlayErrorSounds = chkPlayErrorSounds.Checked;
-        }
-
         private void chkDisableOverlay_CheckedChanged(object sender, EventArgs e)
         {
             ConfigFile.DisableOverlay = chkDisableOverlay.Checked;
@@ -621,100 +686,151 @@ namespace PixelMagic.GUI
             combatRoutine?.ForcePulseUpdate();
         }
 
-        #region Get GIT Version
-
-        private int _gitVersion;
-
-        private int GitHubVersion
-        {
-            get
-            {
-                if (_gitVersion == 0)
-                {
-                    try
-                    {
-                        var versionInfo = Web.GetString("https://raw.githubusercontent.com/winifix/PixelMagic-OpenSource/master/PixelMagic/Properties/AssemblyInfo.cs").
-                            Split('\r').
-                            FirstOrDefault(r => r.Contains("AssemblyFileVersion"))?.
-                            Replace("\n", "").
-                            Replace("[assembly: AssemblyFileVersion(\"", "").
-                            Replace("\")]", "").
-                            Split('.')[0];
-
-                        if (versionInfo != null) _gitVersion = int.Parse(versionInfo);
-                    }
-                    catch
-                    {
-                        _gitVersion = 0;
-                    }
-                }
-                return _gitVersion;
-            }
-        }
-
-        #endregion
-
         private void reloadAddonToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            WoW.SendMacro("/console scriptErrors 1");   // Show wow Lua errors
             WoW.SendMacro("/reload");
         }
 
         private void rtbLog_TextChanged(object sender, EventArgs e)
         {
-
         }
 
         private void statusStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
-
-        }
-
-        private void submitTicketToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            frmSubmitTicket f = new frmSubmitTicket(rtbLog.Text);
-            f.ShowDialog();
-        }
-
-        private void groupBox3_Enter(object sender, EventArgs e)
-        {
-
         }
 
         private void cmdRotationSettings_Click(object sender, EventArgs e)
         {
-            combatRoutine.SettingsForm.ShowDialog();
-        }
-
-        private void label6_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label1_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label4_Click(object sender, EventArgs e)
-        {
-
+            try
+            {
+                combatRoutine.SettingsForm.StartPosition = FormStartPosition.CenterParent;
+                combatRoutine.SettingsForm.ShowDialog();
+            }
+            catch
+            {
+                MessageBox.Show("The selected rotation does not have settings.");
+            }
         }
 
         private void txtTargetCasting_TextChanged(object sender, EventArgs e)
         {
-
-        }
-
-        private void txtTargetHealth_TextChanged(object sender, EventArgs e)
-        {
-
         }
 
         private void imageToByteArrayToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            GUI.frmImageToByteArray f = new GUI.frmImageToByteArray();
+            var f = new frmImageToByteArray();
             f.ShowDialog();
+        }
+
+        private void ReloadRotation(bool reloadUI = true)
+        {
+            Log.Clear();
+
+            var currentRotationState = combatRoutine.State;
+            var currentRotationType = combatRoutine.Type;
+
+            if (currentRotationState == CombatRoutine.RotationState.Running)
+            {
+                cmdStartBot.PerformClick(); // The bot is running stop it first
+                Log.DrawHorizontalLine();
+            }
+
+            // Then re-load the rotation
+            var lastRotation = ConfigFile.ReadValue("PixelMagic", "LastProfile");
+
+            if (!File.Exists(lastRotation)) return;
+
+            if (!LoadProfile(lastRotation, reloadUI)) // Load the last rotation
+            {
+                Log.Write("Failed to load profile, please select a valid file.", Color.Red);
+                return;
+            }
+
+            // Then start the bot if it was running
+            if (currentRotationState == CombatRoutine.RotationState.Running)
+            {
+                Log.DrawHorizontalLine();
+
+                cmdStartBot.PerformClick();
+                combatRoutine.ChangeType(currentRotationType);
+            }
+
+            Log.DrawHorizontalLine();
+        }
+
+        private void cmdReloadRotation_Click(object sender, EventArgs e)
+        {
+            ReloadRotation(false);
+        }
+
+        private void cmdReloadRotationAndUI_Click(object sender, EventArgs e)
+        {
+            ReloadRotation();
+        }
+
+        private void cmdClose_Click(object sender, EventArgs e)
+        {
+            Application.ExitThread();
+        }
+
+        private void licenseAgreementToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var f = new frmLicenseAgreement();
+            f.ShowDialog();
+        }
+
+        private void testingPixelsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var f = new Testing_Pixels();
+            f.Show();
+        }
+
+        private void encryptCRToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //if (ConfigFile.LastRotation.EndsWith(".enc"))
+            //{
+            //    Log.Write("The currently selected routine is already encrypted", Color.Red);
+            //    return;
+            //}
+
+            //if (ConfigFile.LastRotation != "")
+            //{
+            //    try
+            //    {
+            //        string rotationSource;
+
+            //        using (var sr = new StreamReader(ConfigFile.LastRotation))
+            //        {
+            //            var contents = sr.ReadToEnd();
+
+            //            var line1 = contents.Split('\r')[0].Trim();
+
+            //            if (!line1.Contains("@"))
+            //            {
+            //                throw new Exception("You are not permitted to encrypt a combat routine if you have not yet specified an email address on the top line of the routine");
+            //            }
+
+            //            rotationSource = Encryption.Encrypt(contents);
+            //        }
+
+            //        using (var sw = new StreamWriter(ConfigFile.LastRotation.Replace(".cs", ".enc")))
+            //        {
+            //            sw.Write(rotationSource);
+            //            sw.Flush();
+            //        }
+
+            //        Log.Write("File has beem encrypted successfully.", Color.Green);
+            //        Log.Write("Encrypted name: " + ConfigFile.LastRotation.Replace(".cs", ".enc"), Color.Green);
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        Log.Write(ex.Message, Color.Red);
+            //    }
+            //}
+            //else
+            //{
+            //    Log.Write("Please load a rotation so that I know which rotation to encrypt.", Color.Red);
+            //}
         }
     }
 }

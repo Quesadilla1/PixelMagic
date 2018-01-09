@@ -12,6 +12,7 @@ using System.Windows.Forms;
 using PixelMagic.GUI;
 using PixelMagic.Helpers;
 using System.Media;
+using System.Runtime.InteropServices;
 
 // ReSharper disable FunctionNeverReturns
 // ReSharper disable MemberCanBeProtected.Global
@@ -43,7 +44,6 @@ namespace PixelMagic.Rotation
         public CombatRoutine combatRoutine;
         private Thread mainThread;
 
-        private bool messageShown;
         private frmMain parent;
 
         private readonly ManualResetEvent pause = new ManualResetEvent(false);
@@ -70,14 +70,18 @@ namespace PixelMagic.Rotation
             {
                 pause.WaitOne();
 
-                Threads.UpdateProgressBar2(parent.prgPlayerHealth, WoW.HealthPercent);
-                Threads.UpdateProgressBar2(parent.prgPower, WoW.Power);
-                Threads.UpdateProgressBar2(parent.prgTargetHealth, WoW.TargetHealthPercent);
+                Threads.UpdateTextBox(parent.txtPlayerHealth, WoW.HealthPercent.ToString());
+                Threads.UpdateTextBox(parent.txtPlayerPower, WoW.Power.ToString());
+                Threads.UpdateTextBox(parent.txtTargetHealth, WoW.TargetHealthPercent.ToString());
                 Threads.UpdateTextBox(parent.txtTargetCasting, WoW.TargetIsCasting.ToString());
+                Threads.UpdateTextBox(parent.txtRange, WoW.CountEnemyNPCsInRange.ToString());
 
                 Thread.Sleep(500);
             }
         }
+
+        [DllImport("User32.dll")]
+        private static extern short GetAsyncKeyState(Keys vKey);
 
         private void MainThreadTick()
         {
@@ -85,25 +89,19 @@ namespace PixelMagic.Rotation
             {
                 while (true)
                 {
-                    pause.WaitOne();
-
-                    if (WoW.HasFocus)
+                    var key = GetAsyncKeyState(Keys.LShiftKey);
+                    if ((key & 0x8000) != 0)
                     {
-                        Pulse();
-
-                        if (!messageShown)
-                        {
-                            Log.Write("Rotation resumed", Color.Gray);
-
-                            messageShown = true;
-                        }
+                        // Pause rotation when left shift is down
                     }
                     else
                     {
-                        Log.Write("Rotation paused until WoW Window has focus again.", Color.Gray);
-                        messageShown = false;
-                    }
+                        pause.WaitOne();
 
+                        Overlay.UpdateLabelsCooldowns();
+                        Pulse();
+                    }
+                    
                     Thread.Sleep(PulseFrequency + random.Next(50));
                 }
             }
@@ -128,7 +126,7 @@ namespace PixelMagic.Rotation
             mainThread.Start();
 
             combatRoutine = this;
-
+            
             Initialize();
         }
 
@@ -157,8 +155,8 @@ namespace PixelMagic.Rotation
                 if (State == RotationState.Stopped)
                 {
                     Log.Write("Starting bot...", Color.Green);
-
-                    if (WoW.pWow == null)
+                    
+                    if (WoW.Process == null)
                     {
                         Log.Write("World of warcraft is not detected / running, please login before attempting to restart the bot", Color.Red);
                         return;
@@ -167,6 +165,8 @@ namespace PixelMagic.Rotation
                     pause.Set();
 
                     State = RotationState.Running;
+
+                    Overlay.StartLabelUpdate();
                 }
             }
             catch (Exception ex)
@@ -191,6 +191,8 @@ namespace PixelMagic.Rotation
                     State = RotationState.Stopped;
 
                     Log.Write("Combat routine has been stopped sucessfully.", Color.IndianRed);
+
+                    Overlay.StopLabelUpdate();
                 }
             }
             catch (Exception ex)
@@ -202,18 +204,37 @@ namespace PixelMagic.Rotation
 
         public void ChangeType(RotationType rotationType)
         {
-            if (_rotationType != rotationType)
+            if (_rotationType == rotationType) return;
+
+            _rotationType = rotationType;
+
+            Log.Write("Rotation type: " + rotationType);
+
+            WoW.Speak(rotationType.ToString());
+
+            if (ConfigFile.PlayErrorSounds)
             {
-                _rotationType = rotationType;
+                SystemSounds.Beep.Play();
+            }
 
-                Log.Write("Rotation type: " + rotationType);
+            Overlay.updateLabels();
+        }
 
-                if (ConfigFile.PlayErrorSounds)
-                {
-                    SystemSounds.Beep.Play();
-                }
+        private bool useCooldowns;
 
-                Overlay.updateLabels();
+        public bool UseCooldowns
+        {
+            get
+            {
+                return useCooldowns;
+            }
+            set
+            {
+                useCooldowns = value;
+
+                Log.Write("UseCooldowns = " + value);
+
+                Overlay.UpdateLabelsCooldowns();
             }
         }
 

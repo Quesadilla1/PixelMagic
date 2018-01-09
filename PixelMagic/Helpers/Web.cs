@@ -5,7 +5,10 @@
 //////////////////////////////////////////////////
 
 using System;
+using System.Globalization;
+using System.IO;
 using System.Net;
+using System.Net.Sockets;
 
 namespace PixelMagic.Helpers
 {
@@ -28,6 +31,18 @@ namespace PixelMagic.Helpers
                 }
 
                 return stringData;
+            }
+        }
+
+        public static DateTime NistTime
+        {
+            get
+            {
+                var myHttpWebRequest = (HttpWebRequest)WebRequest.Create("http://www.microsoft.com");
+                var response = myHttpWebRequest.GetResponse();
+                string todaysDates = response.Headers["date"];
+                DateTime dateTime = DateTime.ParseExact(todaysDates, "ddd, dd MMM yyyy HH:mm:ss 'GMT'", CultureInfo.InvariantCulture.DateTimeFormat, DateTimeStyles.AssumeUniversal);
+                return dateTime;
             }
         }
     }

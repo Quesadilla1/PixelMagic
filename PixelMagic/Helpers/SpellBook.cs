@@ -1,6 +1,13 @@
-﻿using System;
+﻿//////////////////////////////////////////////////
+//                                              //
+//   See License.txt for Licensing information  //
+//                                              //
+//////////////////////////////////////////////////
+
+using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -17,34 +24,67 @@ namespace PixelMagic.Helpers
 
         public static List<Spell> Spells;
         public static List<Aura> Auras;
-
+        public static List<Item> Items;
+        
         public static DataTable dtSpells;
         public static DataTable dtAuras;
+        public static DataTable dtItems;
 
-        public static bool Initialize(string fullRotationFilePath)
+        public static bool Initialize(string fullRotationFilePath, bool reloadUI = true)
         {
             FullRotationFilePath = fullRotationFilePath;
 
             Spells = new List<Spell>();
             Auras = new List<Aura>();
+            Items = new List<Item>();
 
             dtSpells = new DataTable();            
             dtSpells.Columns.Add("Spell Id");
             dtSpells.Columns.Add("Spell Name");
             dtSpells.Columns.Add("Key Bind");
             dtSpells.Columns.Add("InternalNo"); // This stores the spell no in the array of spells that will be used on the addon
+            dtSpells.Columns.Add("My Keybind"); // This stores the spell no in the array of spells that will be used on the addon
 
             dtAuras = new DataTable();
             dtAuras.Columns.Add("Aura Id");
             dtAuras.Columns.Add("Aura Name");
             dtAuras.Columns.Add("InternalNo"); // This stores the aura no in the array of auras that will be used on the addon
 
-            return Load();
+            dtItems = new DataTable();
+            dtItems.Columns.Add("Item Id");
+            dtItems.Columns.Add("Item Name");
+            dtItems.Columns.Add("InternalNo"); // This stores the item no in the array of items that will be used on the addon
+
+            return Load(reloadUI);
         }
 
-        public static void AddSpell(NumericUpDown spellId, TextBox spellName, ComboBox keyBind)
+        public static void AddSpell(NumericUpDown spellId, TextBox spellName, Keys key)
         {
-            AddSpell(int.Parse(spellId.Value.ToString()), spellName.Text, keyBind.Text);
+            AddSpell(int.Parse(spellId.Value.ToString()), spellName.Text, key.ToString());
+        }
+
+        public static void UpdateSpellsFromDataTable()
+        {
+            foreach (DataRow drSpell in dtSpells.Rows)
+            {
+                int spellId = int.Parse(drSpell[0].ToString());
+                string keyBind = drSpell[2].ToString();
+                UpdateSpellKeybind(spellId, keyBind);
+            }
+        }
+
+        public static void UpdateSpellKeybind(int spellId, string keyBind)
+        {
+            try
+            {
+                Spell spell = Spells.FirstOrDefault(s => s.SpellId == spellId);
+                spell.KeyBind = keyBind;
+            }
+            catch(Exception ex)
+            {
+                Log.Write("Failed to update key binding for spell id " + spellId, Color.Red);
+                Log.Write("Error " + ex.Message, Color.Red);
+            }
         }
 
         private static void RenumberSpells()
@@ -63,6 +103,17 @@ namespace PixelMagic.Helpers
             var i = 1;
 
             foreach (DataRow dr in dtAuras.Rows)
+            {
+                dr["InternalNo"] = i;
+                i++;
+            }
+        }
+
+        private static void RenumberItems()
+        {
+            var i = 1;
+
+            foreach (DataRow dr in dtItems.Rows)
             {
                 dr["InternalNo"] = i;
                 i++;
@@ -117,6 +168,29 @@ namespace PixelMagic.Helpers
             }
         }
 
+        public static void AddItem(NumericUpDown ItemId, TextBox ItemName)
+        {
+            AddItem(int.Parse(ItemId.Value.ToString()), ItemName.Text);
+        }
+
+        public static void AddItem(int itemId, string itemName)
+        {
+            if (dtItems != null && dtItems.Select($"[Item Id] = '{itemId}'").Length == 0)
+            {
+                dtItems.Rows.Add(itemId, itemName);
+                RenumberItems();
+
+                var newItemId = int.Parse(dtItems.Select($"[Item Id] = '{itemId}'")[0]["InternalNo"].ToString());
+
+                Items.Add(new Item(itemId, itemName, newItemId));
+            }
+            else
+            {
+                MessageBox.Show("The current Item already exists, you may not add it twice", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+
         public static void RemoveSpell(NumericUpDown spellId)
         {
             RemoveSpell(int.Parse(spellId.Value.ToString()));
@@ -155,25 +229,43 @@ namespace PixelMagic.Helpers
             }
         }
 
-        public static bool Load()
+        public static void RemoveItem(NumericUpDown itemId)
+        {
+            RemoveItem(int.Parse(itemId.Value.ToString()));
+        }
+
+        public static void RemoveItem(int itemId)
+        {
+            if (dtItems.Select($"[Item Id] = '{itemId}'").Length == 1)
+            {
+                dtItems.Rows.Remove(dtItems.Select($"[Item Id] = '{itemId}'").FirstOrDefault());
+                Items.Remove(Items.FirstOrDefault(a => a.ItemId == itemId));
+            }
+            else
+            {
+                MessageBox.Show("The current Item does not exist in the spellbook yet, so it can't be removed", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        public static bool Load(bool reloadUI = true)
         {
             using (var sr = new StreamReader(FullRotationFilePath))
             {
-                string fileContents = sr.ReadToEnd();
+                var fileContents = sr.ReadToEnd();
 
-                bool encrypted = (FullRotationFilePath.EndsWith(".enc"));
+                //var encrypted = (FullRotationFilePath.EndsWith(".enc"));
 
-                if (encrypted)
-                { 
-                    fileContents = Encryption.Decrypt(fileContents);
-                }
+                //if (encrypted)
+                //{ 
+                    //fileContents = Encryption.Decrypt(fileContents);
+                //}
                 
                 RotationFileContents = fileContents;
 
-                bool addonLines = false;
-                bool readLines = false;
+                var addonLines = false;
+                var readLines = false;
                 
-                foreach (string line in fileContents.Split('\n'))
+                foreach (var line in fileContents.Split('\n'))
                 {                
                     if (line.Contains("AddonDetails.db"))
                     {
@@ -219,6 +311,11 @@ namespace PixelMagic.Helpers
                         {
                             AddAura(int.Parse(split[1]), split[2]);
                         }
+
+                        if (split[0] == "Item")
+                        {
+                            AddItem(int.Parse(split[1]), split[2]);
+                        }
                     }
                 }
 
@@ -233,7 +330,7 @@ namespace PixelMagic.Helpers
 
                     if (!File.Exists(AddonPath + "\\" + AddonName + "\\" + AddonName + ".toc"))
                     {
-                        return GenerateLUAFile();
+                        return GenerateLUAFile(reloadUI);
                     }
                 }
                 else
@@ -250,32 +347,33 @@ namespace PixelMagic.Helpers
 
         public static string AddonAuthor;
         public static string InterfaceVersion;
+        public static int NumericInterfaceVersion => int.Parse(InterfaceVersion.Contains("-") ? InterfaceVersion.Split('-')[1].Trim() : InterfaceVersion);
         public static string AddonName => ConfigFile.ReadValue("PixelMagic", "AddonName");
 
         public static string RotationFileContents = "";
 
-        public static void Save(TextBox author, string interfaceVersion, TextBox addonName)
+        public static void Save(TextBox author, string interfaceVersion)
         {
             AddonAuthor = author.Text.Replace("\n", "").Replace("\r", "");
             InterfaceVersion = interfaceVersion;
             
             try
             {
-                string fullRotationText = "";
+                var fullRotationText = "";
 
-                bool encrypted = (FullRotationFilePath.EndsWith(".enc"));
+                var encrypted = FullRotationFilePath.EndsWith(".enc");
 
                 using (var sr = new StreamReader(FullRotationFilePath))
                 {
-                    bool readLines = true;
-                    string fileContents = sr.ReadToEnd();
+                    var readLines = true;
+                    var fileContents = sr.ReadToEnd();
                     
-                    if (encrypted)
-                    {
-                        fileContents = Encryption.Decrypt(fileContents);
-                    }
+                    //if (encrypted)
+                    //{
+                    //    fileContents = Encryption.Decrypt(fileContents);
+                    //}
 
-                    foreach (string line in fileContents.Split('\n'))
+                    foreach (var line in fileContents.Split('\n'))
                     {
                         if (line.Contains("AddonDetails.db"))
                         {
@@ -298,7 +396,7 @@ namespace PixelMagic.Helpers
                     sr.Close();
                 }
 
-                string updatedRotationText = fullRotationText + Environment.NewLine;
+                var updatedRotationText = fullRotationText + Environment.NewLine;
                 updatedRotationText += "[AddonDetails.db]" + Environment.NewLine;
                 updatedRotationText += $"AddonAuthor={AddonAuthor}" + Environment.NewLine;
                 updatedRotationText += $"AddonName={AddonName}" + Environment.NewLine;
@@ -306,25 +404,22 @@ namespace PixelMagic.Helpers
 
                 updatedRotationText += "[SpellBook.db]" + Environment.NewLine;
 
-                foreach (var spell in Spells)
-                {
-                    updatedRotationText += $"Spell,{spell.SpellId},{spell.SpellName},{spell.KeyBind}" + Environment.NewLine;
-                }
-                foreach (var aura in Auras)
-                {
-                    updatedRotationText += $"Aura,{aura.AuraId},{aura.AuraName}" + Environment.NewLine;
-                }
+                UpdateSpellsFromDataTable();
+
+                updatedRotationText = Spells.Aggregate(updatedRotationText, (current, spell) => current + ($"Spell,{spell.SpellId},{spell.SpellName},{spell.KeyBind}" + Environment.NewLine));
+                updatedRotationText = Auras.Aggregate(updatedRotationText, (current, aura) => current + ($"Aura,{aura.AuraId},{aura.AuraName}" + Environment.NewLine));
+                updatedRotationText = Items.Aggregate(updatedRotationText, (current, item) => current + ($"Item,{item.ItemId},{item.ItemName}" + Environment.NewLine));
 
                 updatedRotationText += "*/";
 
                 using (var sw = new StreamWriter(FullRotationFilePath, false))
                 {
-                    if (encrypted)
-                    {
-                        updatedRotationText = Encryption.Encrypt(updatedRotationText);
-                        sw.WriteLine(updatedRotationText);
-                    }
-                    else
+                    //if (encrypted)
+                    //{
+                    //    updatedRotationText = Encryption.Encrypt(updatedRotationText);
+                    //    sw.WriteLine(updatedRotationText);
+                    //}
+                    //else
                     {
                         sw.WriteLine(updatedRotationText);
                     }                    
@@ -342,20 +437,69 @@ namespace PixelMagic.Helpers
             }
         }
 
-        private static string AddonPath
+        private static string AddonPath => $"{WoW.AddonPath}\\{AddonName}";
+
+        private static string LibStubPath => $"{WoW.AddonPath}\\{AddonName}\\Boss\\LibStub";
+
+        private static string LibBossPath => $"{WoW.AddonPath}\\{AddonName}\\Boss";
+
+        private static string LibRangeStubPath => $"{WoW.AddonPath}\\{AddonName}\\Range\\LibStub";
+
+        private static string LibRangePath => $"{WoW.AddonPath}\\{AddonName}\\Range";
+
+        private static void CustomLua()
         {
-            get
+            Log.Write("Starting Addon Edit, for Custom Lua...");
+
+            try
             {
-                return $"{WoW.AddonPath}\\{AddonName}";
+                var CustomLua = File.ReadAllText(FullRotationFilePath.Replace(".cs", ".lua"));
+                if (CustomLua.Trim() == "")
+                {
+                    Log.Write("Custom lua is blank, not using it...", Color.Gray);
+                    return;
+                }
+
+                try
+                {
+                    var addonlua = File.ReadAllText($"{AddonPath}\\{AddonName}.lua");
+
+                    addonlua = addonlua.Replace("local lastCombat = nil" + Environment.NewLine + "local alphaColor = 1", "local lastCombat = nil" + Environment.NewLine + "local alphaColor = 1" + Environment.NewLine + CustomLua);
+                    addonlua = addonlua.Replace("InitializeOne()" + Environment.NewLine + "            InitializeTwo()",
+                                                "InitializeOne()" + Environment.NewLine + "            InitializeTwo()" + Environment.NewLine + "            InitializeThree()");
+
+                    File.WriteAllText($"{AddonPath}\\{AddonName}.lua", addonlua);
+                    Log.Write("Addon Editing in progress", Color.Green);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.ToString(), "PixelMagic", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
+            catch 
+            {
+                Log.Write("Custom Lua file not supplied, using default Lua", Color.Gray);
+            }            
         }
 
-        public static bool GenerateLUAFile()
+        public static bool GenerateLUAFile(bool reloadUI = true)
         {
             try
             {
                 if (!Directory.Exists(AddonPath))
                     Directory.CreateDirectory(AddonPath);
+
+                if (!Directory.Exists(LibBossPath))
+                    Directory.CreateDirectory(LibBossPath);
+
+                if (!Directory.Exists(LibStubPath))
+                    Directory.CreateDirectory(LibStubPath);
+
+                if (!Directory.Exists(LibRangePath))
+                    Directory.CreateDirectory(LibRangePath);
+
+                if (!Directory.Exists(LibRangeStubPath))
+                    Directory.CreateDirectory(LibRangeStubPath);
 
                 Log.Write($"Creating Addon from SpellBook, AddonName will be [{AddonName}]...");
 
@@ -371,20 +515,143 @@ namespace PixelMagic.Helpers
                     //  DoItBase.lua
 
                     sr.WriteLine($"## Author: {AddonAuthor.Replace("\r", "").Replace("\n", "")}");
-
-                    if (InterfaceVersion.Contains("-"))
-                        sr.WriteLine($"## Interface: {InterfaceVersion.Split('-')[1].Trim()}");
-                    else
-                        sr.WriteLine($"## Interface: {InterfaceVersion}");
+                    
+                    sr.WriteLine($"## Interface: {NumericInterfaceVersion}");
                     sr.WriteLine($"## Title: {AddonName.Replace("\r", "").Replace("\n", "")}");
                     sr.WriteLine($"## Version: {Application.ProductVersion}");
                     sr.WriteLine($"## SavedVariablesPerCharacter: {AddonName.Replace("\r", "").Replace("\n", "")}_settings");
                     sr.WriteLine($"{AddonName.Replace("\r", "").Replace("\n", "")}.lua");
+                    sr.WriteLine(@"#@no-lib-strip@");
+                    sr.WriteLine("BossLib.xml");
+                    sr.WriteLine("RangeLib.xml");
+                    sr.WriteLine(@"#@end-no-lib-strip@");
+                    sr.Close();
+                }
+
+ ///////////////////////////////////////////////////////////////////////////////////////////////// BOSS LIB /////////////////////////////////////////
+ 
+                Log.Write("Creating file: [BossLib.xml]", Color.Gray);
+
+                using (var sr = new StreamWriter($"{AddonPath}\\BossLib.xml"))
+                {
+                    sr.WriteLine(@"<Ui xmlns=""http://www.blizzard.com/wow/ui/"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xsi:schemaLocation=""http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd"">");
+                    sr.WriteLine(@"<Script file=""Boss\LibStub\LibStub.lua""/>");
+                    sr.WriteLine(@"<Include file=""Boss\lib.xml""/>");
+                    sr.WriteLine(@"</Ui>");
+                    sr.Close();
+                }
+
+                Log.Write("Creating file: [Boss\\LibBossIDs-1.0.toc]", Color.Gray);
+
+                using (var sr = new StreamWriter($"{LibBossPath}\\LibBossIDs-1.0.toc"))
+                {
+                    sr.WriteLine(InterfaceVersion.Contains("-")? $"## Interface: {InterfaceVersion.Split('-')[1].Trim()}" : $"## Interface: {InterfaceVersion}");
+                    sr.WriteLine("## LoadOnDemand: 1");
+                    sr.WriteLine("## Title: Lib: BossIDs-1.0");
+                    sr.WriteLine("## A library to provide mobIDs for bosses.");
+                    sr.WriteLine("## Author: Elsia");
+                    sr.WriteLine("## X-Category: Library");
+                    sr.WriteLine("## X-License: Public Domain");
+                    sr.WriteLine("## X-Curse-Packaged-Version: r97-release");
+                    sr.WriteLine("## X-Curse-Project-Name: LibBossIDs-1.0");
+                    sr.WriteLine("## X-Curse-Project-ID: libbossids-1-0");
+                    sr.WriteLine("## X-Curse-Repository-ID: wow/libbossids-1-0/mainline");
+                    sr.WriteLine("LibStub\\LibStub.lua");
+                    sr.WriteLine("lib.xml");
+                    sr.Close();
+                }
+
+                Log.Write("Creating file: [Boss\\lib.xml]", Color.Gray);
+
+                using (var sr = new StreamWriter($"{AddonPath}\\Boss\\lib.xml"))
+                {
+                    sr.WriteLine(@"<Ui xmlns=""http://www.blizzard.com/wow/ui/"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xsi:schemaLocation=""http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd"">");
+                    sr.WriteLine(@"<Script file=""LibBossIDs-1.0.lua"" />");
+                    sr.WriteLine("</Ui>");
+                    sr.Close();
+                }
+
+                Log.Write("Creating file: [Boss\\LibBossIDs-1.0.lua]", Color.Gray);
+
+                using (var sr = new StreamWriter($"{AddonPath}\\Boss\\LibBossIDs-1.0.lua"))
+                {
+                    var luaContents1 = AddonLibBoss.LuaContents;
+                    sr.WriteLine(luaContents1);
+                    sr.Close();
+                }
+
+                Log.Write("Creating file: [Boss\\LibStub\\LibStub.lua]", Color.Gray);
+
+                using (var sr = new StreamWriter($"{AddonPath}\\Boss\\LibStub\\LibStub.lua"))
+                {
+                    var luaContents2 = AddonLibStub.LuaContents;
+                    sr.WriteLine(luaContents2);
+                    sr.Close();
+                }
+
+ ///////////////////////////////////////////////////////////////////////////////////////////////// RANGE LIB /////////////////////////////////////////
+
+                Log.Write("Creating file: [RangeLib.xml]", Color.Gray);
+
+                using (var sr = new StreamWriter($"{AddonPath}\\RangeLib.xml"))
+                {
+                    sr.WriteLine(@"<Ui xmlns=""http://www.blizzard.com/wow/ui/"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xsi:schemaLocation=""http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd"">");
+                    sr.WriteLine(@"<Script file=""Range\LibStub\LibStub.lua""/>");
+                    sr.WriteLine(@"<Include file=""Range\lib.xml""/>");
+                    sr.WriteLine(@"</Ui>");
+                    sr.Close();
+                }
+
+                Log.Write("Creating file: [Range\\LibSpellRange - 1.0.toc]", Color.Gray);
+
+                using (var sr = new StreamWriter($"{LibRangePath}\\LibSpellRange-1.0.toc"))
+                {
+                    sr.WriteLine(InterfaceVersion.Contains("-") ? $"## Interface: {InterfaceVersion.Split('-')[1].Trim()}" : $"## Interface: {InterfaceVersion}");
+                    sr.WriteLine("## LoadOnDemand: 1");
+                    sr.WriteLine("## Title: Lib: SpellRange-1.0");
+                    sr.WriteLine("## Notes: Provides enhanced spell range checking functionality");
+                    sr.WriteLine("## Author: Cybeloras of Aerie Peak");
+                    sr.WriteLine("## X-Category: Library");
+                    sr.WriteLine("## X-License: Public Domain");
+                    sr.WriteLine("## X-Curse-Packaged-Version: 1.0.011");
+                    sr.WriteLine("## X-Curse-Project-Name: LibSpellRange-1.0");
+                    sr.WriteLine("## X-Curse-Project-ID: libspellrange-1-0");
+                    sr.WriteLine("## X-Curse-Repository-ID: wow/libspellrange-1-0/mainline");
+                    sr.WriteLine("LibStub\\LibStub.lua");
+                    sr.WriteLine("lib.xml");
+                    sr.Close();
+                }
+
+                Log.Write("Creating file: [Range\\lib.xml]", Color.Gray);
+
+                using (var sr = new StreamWriter($"{AddonPath}\\Range\\lib.xml"))
+                {
+                    sr.WriteLine(@"<Ui xmlns=""http://www.blizzard.com/wow/ui/"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xsi:schemaLocation=""http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd"">");
+                    sr.WriteLine(@"<Script file=""LibSpellRange-1.0.lua"" />");
+                    sr.WriteLine("</Ui>");
+                    sr.Close();
+                }
+
+                Log.Write("Creating file: [Range\\LibSpellRange-1.0.lua]", Color.Gray);
+
+                using (var sr = new StreamWriter($"{AddonPath}\\Range\\LibSpellRange-1.0.lua"))
+                {
+                    var luaContents = AddonLibRange.LuaContents;
+                    sr.WriteLine(luaContents);
+                    sr.Close();
+                }
+
+                Log.Write("Creating file: [Range\\LibStub\\LibStub.lua]", Color.Gray);
+
+                using (var sr = new StreamWriter($"{AddonPath}\\Range\\LibStub\\LibStub.lua"))
+                {
+                    var luaContents = AddonLibStubRange.LuaContents;
+                    sr.WriteLine(luaContents);
                     sr.Close();
                 }
 
                 Log.Write($"Creating file: [{AddonName}.lua]", Color.Gray);
-
+                
                 using (var sr = new StreamWriter($"{AddonPath}\\{AddonName}.lua"))
                 {
                     //local cooldowns = { --These should be spellIDs for the spell you want to track for cooldowns
@@ -447,32 +714,40 @@ namespace PixelMagic.Helpers
 
                     sr.Write(debuffs);
 
-                    var luaContents = Addon.LuaContents;
+                    var items = "local items = { --These should be itemIDs for the items you want to track " + Environment.NewLine;
 
-                    luaContents = luaContents.Replace("DoIt", AddonName);
-
-                    string AddonInterfaceVersion = InterfaceVersion;
-                    if (InterfaceVersion.Contains("-"))
-                        AddonInterfaceVersion = InterfaceVersion.Split('-')[1].Trim();
-
-                    if (AddonInterfaceVersion == "70000") // Legion changes as per http://www.wowinterface.com/forums/showthread.php?t=53248
+                    foreach (var item in Items)
                     {
-                        luaContents = luaContents.Replace("SetTexture", "SetColorTexture");
-
-                        // For now the below are disabled till further testing is done
-                        // luaContents = luaContents.Replace(@"UnitPower(""player"");", @"UnitPower(""player"", UnitPowerType(""player""))");
-                        // luaContents = luaContents.Replace(@"UnitPowerMax(""player"");", @"UnitPowerMax(""player"", UnitPowerType(""player""))");
+                        if (item.ItemId == Items.Count)  // We are adding the last item, dont include the comma
+                        {
+                            items += $"    {item.ItemId} \t -- {item.ItemName}" + Environment.NewLine;
+                        }
+                        else
+                        {
+                            items += $"    {item.ItemId},\t -- {item.ItemName}" + Environment.NewLine;
+                        }
                     }
 
+                    items += "}" + Environment.NewLine;
+
+                    sr.Write(items);
+
+                    var luaContents = Addon.LuaContents;
+                    luaContents = luaContents.Replace("[PixelMagic]", AddonName);
                     sr.WriteLine(luaContents);
                     sr.Close();
                 }
-
+                
                 Log.Write("Addon file generated.", Color.Green);
+
+                CustomLua();
+
                 Log.Write($"Make sure that the addon: [{AddonName}] is enabled in your list of WoW Addons or the rotation bot will fail to work", Color.Black);
 
-                WoW.SendMacro("/console scriptErrors 1");   // Show wow Lua errors
-                WoW.SendMacro("/reload");
+                if (reloadUI)
+                {
+                    WoW.SendMacro("/reload");
+                }
 
                 return true;
             }

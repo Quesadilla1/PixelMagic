@@ -1,4 +1,10 @@
-﻿using System;
+﻿//////////////////////////////////////////////////
+//                                              //
+//   See License.txt for Licensing information  //
+//                                              //
+//////////////////////////////////////////////////
+
+using System;
 
 namespace PixelMagic.Helpers
 {
@@ -9,6 +15,7 @@ namespace PixelMagic.Helpers
             InternalSpellNo = internalSpellNo;
 
             SpellId = spellId;
+            
             SpellName = spellName.Replace("\r", "").Replace("\n", "");
             KeyBind = keyBind.Replace("\r", "").Replace("\n", "");
         }
@@ -19,19 +26,13 @@ namespace PixelMagic.Helpers
 
         public string SpellName { get; }
 
-        public string KeyBind { get; }
+        public string KeyBind { get; internal set; }
 
         private static WoW.Keys toKey(string keystr)
         {
             return (WoW.Keys)Enum.Parse(typeof(WoW.Keys), keystr);
         }
 
-        public WoW.Keys Key
-        {
-            get
-            {
-                return toKey(KeyBind);
-            }
-        }
+        public WoW.Keys Key => toKey(KeyBind);
     }
 }

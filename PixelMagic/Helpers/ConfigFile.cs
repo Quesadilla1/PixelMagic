@@ -5,9 +5,11 @@
 //////////////////////////////////////////////////
 
 using System;
+using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
+using PixelMagic.GUI;
 
 namespace PixelMagic.Helpers
 {
@@ -46,7 +48,15 @@ namespace PixelMagic.Helpers
 
                 return true;
             }
-            set { WriteValue("PixelMagic", "DisableOverlay", value.ToString()); }
+            set
+            {
+                WriteValue("PixelMagic", "DisableOverlay", value.ToString());
+
+                if (value)
+                    Overlay.HideOverlay();
+                else
+                    Overlay.ShowOverlay();
+            }
         }
 
         public static decimal Pulse
@@ -64,6 +74,71 @@ namespace PixelMagic.Helpers
             }
             set { WriteValue("PixelMagic", "Pulse", value.ToString()); }
         }
+
+        public static decimal Latency
+        {
+            get
+            {
+                var latency = ReadValue("PixelMagic", "Latency").Trim();
+
+                if (latency != "")
+                {
+                    return Convert.ToDecimal(latency);
+                }
+
+                return 0;
+            }
+            set
+            {
+                Log.Write($"Latency Updated to: {value}, Please restart PixelMagic for changes to take effect", Color.Red);
+                WriteValue("PixelMagic", "Latency", value.ToString());
+            }
+        }
+
+        public static bool LicenseAccepted
+        {
+            get
+            {
+                var licenseAccepted = ReadValue("PixelMagic", "License Accepted").Trim();
+
+                if (licenseAccepted != "")
+                {
+                    return Convert.ToBoolean(licenseAccepted);
+                }
+
+                return false;
+            }
+            set
+            {
+                WriteValue("PixelMagic", "License Accepted", value.ToString());
+            }
+        }
+
+        public static string GitHubName
+        {
+            get
+            {
+                 return ReadValue("PixelMagic", "GitHubName").Trim();
+            }
+            set
+            {
+                WriteValue("PixelMagic", "GitHubName", value);
+            }
+        }
+
+        public static string GitHubPassword
+        {
+            get
+            {
+                return ReadValue("PixelMagic", "GitHubPassword").Trim();
+            }
+            set
+            {
+                WriteValue("PixelMagic", "GitHubPassword", value);
+            }
+        }
+
+        public static string LatencyForAddon => (int.Parse(Latency.ToString()) * 2 / 1000.0).ToString("#0.000");
 
         [DllImport("kernel32")]
         private static extern long WritePrivateProfileString(string section, string key, string val, string filePath);
