@@ -3,12 +3,11 @@
 Developer and copyright owner: WiNiFiX<br>
 Project stated on: December 2015<br>
 
-**Last Readme Update: 2018.01.09**
-
 **Latest Build:**<br>
 For those of you whom don't know how to compile the source and run it you can download this version here then unzip the<br> 
 "PixelMagic-master.zip" file and look in the "PixelMagic-master\PixelMagic\Builds" folder and run<br> 
 the application "PixelMagic.exe"<br>
+
 ---
 
 **Website for FAQ:** [here](http://www.ownedcore.com/forums/world-of-warcraft/world-of-warcraft-bots-programs/wow-bots-questions-requests/542750-pixel-based-bot.html)<br>
