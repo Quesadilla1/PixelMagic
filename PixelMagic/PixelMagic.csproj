@@ -304,8 +304,12 @@
     <Compile Include="Rotations\Rogue\Rogue-Subtlety-Zanrub.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Rotations\Shaman\Shaman-Elemental-Toomicek.cs" />
-    <Compile Include="Rotations\Shaman\Shaman-Enhancement-Toomicek.cs" />
+    <Compile Include="Rotations\Shaman\Shaman-Elemental-Toomicek.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Rotations\Shaman\Shaman-Enhancement-Toomicek.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
     <Compile Include="Rotations\Warlock\Warlock-Affliction-Sorcerer.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
