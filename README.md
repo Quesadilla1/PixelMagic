@@ -1,7 +1,7 @@
-# Pixel Magic - where colour unlocks the World of Warcraft.
+# Pixel Magic - where color unlocks the World of Warcraft.
 
 Developer and copyright owner: WiNiFiX<br>
-Project stated on: January 2016<br>
+Project stated on: December 2015<br>
 
 **Last Readme Update: 2016.07.28**
 
@@ -18,7 +18,6 @@ rotation file.
 ---
 
 **Website for FAQ:** [here](http://www.ownedcore.com/forums/world-of-warcraft/world-of-warcraft-bots-programs/wow-bots-questions-requests/542750-pixel-based-bot.html)<br>
-**Official Discord:** [here](https://discord.gg/0rnM62Wx5pQp8tjT)<br>
 *Instructions on how to use / test / build this version are on Discord along with support*
 
 **Currently supports WoW Versions**
@@ -46,10 +45,14 @@ rotation file.
 **License Agreement**<br>
 The software is provided "as is", without warranty of any kind, express or implied, including<br>
 but not limited to the warranties of merchantability, fitness for a particular purpose and<br>
-noninfringement. In no event shall the authors or copyright holders be liable for any claim,<br>
+non-infringement. In no event shall the authors or copyright holders be liable for any claim,<br>
 damages or other liability, whether in an action of contract, tort or otherwise, arising from,<br>
 out of or in connection with the software or the use or other dealings in the software.<br>
-
+<br>
+this version (410) of pixel magic is open-source and anyone using or distributing it must keep<br>
+their products open-source under no conditions may this product me used for sale or donations<br>
+(unless those donations go to a registered charity)<br>
+<br>
 Anyone using / copying any part of the software must include this license<br>
 
 **Icon backlink:** [HADezign](http://hadezign.com)
