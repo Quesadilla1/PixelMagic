@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace PixelMagic.Rotation
 {
-    public class DemonHunterHavoc : CombatRoutine
+    public class DemonHunterHavocS : CombatRoutine
     {
         public override string Name
         {
@@ -44,13 +44,13 @@ namespace PixelMagic.Rotation
                 {
                     if (WoW.CanCast("Chaos Strike") && WoW.Fury >= 40) // Fury Spender
                     {
-                        WoW.CastSpellByName("Chaos Strike");
+                        WoW.CastSpell("Chaos Strike");
                         return;
                     }
 
                     if (WoW.CanCast("Demons Bite") && WoW.Fury <= 60)  // Fury Generator
                     {
-                        WoW.CastSpellByName("Demons Bite");
+                        WoW.CastSpell("Demons Bite");
                         return;
                     }                    
                 }

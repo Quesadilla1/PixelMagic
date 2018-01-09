@@ -155,29 +155,17 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Rotations\DeathKnight\DeathKnight_3.3.5a.cs" />
-    <Compile Include="Rotations\DeathKnight\DKUnholy.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="Rotations\DemonHunter\DemonHunter-Havoc.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="Rotations\Druid\FeralSeed.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="Rotations\Hunter\Hunter-Incorrect %28for testing%29.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="Rotations\Rogue\Rogue.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="Rotations\Warrior\Warrior.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
+    <Compile Include="Rotations\DeathKnight\DeathKnight-Unholy-WiNiFiX.cs" />
+    <Compile Include="Rotations\DeathKnight\DKUnholy.cs" />
+    <Compile Include="Rotations\DemonHunter\DemonHunter-Havoc.cs" />
+    <Compile Include="Rotations\DemonHunter\DemonHunter-Vengeance-WiNiFiX.cs" />
+    <Compile Include="Rotations\Druid\FeralSeed.cs" />
+    <Compile Include="Rotations\Hunter\Hunter-Incorrect %28for testing%29.cs" />
+    <Compile Include="Rotations\Hunter\Hunter.cs" />
+    <Compile Include="Rotations\Paladin\Paladin-Retribution-WiNiFiX.cs" />
+    <Compile Include="Rotations\Rogue\Rogue.cs" />
+    <Compile Include="Rotations\Warrior\Warrior.cs" />
     <Compile Include="Rotation\CombatRoutine.cs" />
-    <Compile Include="Rotations\Hunter\Hunter.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
     <None Include="Resources\Refresh2_16x16.png" />
     <None Include="Resources\PageSetup_16x16.png" />
     <None Include="Resources\Project_16x16.png" />
@@ -187,7 +175,6 @@
     <None Include="Resources\Register.png" />
     <Content Include="Hadezign-Hobbies-Magic.ico" />
     <None Include="Resources\pm.png" />
-    <Content Include="ToDoList.txt" />
     <EmbeddedResource Include="ColorProgressBar\ColorProgressBar.resx">
       <DependentUpon>ColorProgressBar.cs</DependentUpon>
     </EmbeddedResource>
@@ -249,6 +236,11 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Builds\Rotations\" />
+    <Folder Include="Rotations\Mage\" />
+    <Folder Include="Rotations\Monk\" />
+    <Folder Include="Rotations\Priest\" />
+    <Folder Include="Rotations\Shaman\" />
+    <Folder Include="Rotations\Warlock\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

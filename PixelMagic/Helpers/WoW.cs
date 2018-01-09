@@ -494,6 +494,9 @@ namespace PixelMagic.Helpers
         public static int Rage => Power;
         public static int Fury => Power;
         public static int RunicPower => Power;
+        public static int Pain => Power;
+
+        public static int Maelstrom => Power;
 
         public static bool HasFocus
         {
@@ -586,7 +589,7 @@ namespace PixelMagic.Helpers
                     return false;
 
             if (checkSpellCharges)
-                if (GetSpellCharges(spellNoInArrayOfSpells) <= 0)
+                if (PlayerSpellCharges(spellNoInArrayOfSpells) <= 0)
                     return false;
 
             if (checkIfTargetIsVisible)
@@ -661,7 +664,7 @@ namespace PixelMagic.Helpers
             KeyPressRelease(Keys.Enter);
         }
         
-        public static int GetBuffStacks(int auraNoInArrayOfAuras)
+        public static int PlayerBuffStacks(int auraNoInArrayOfAuras)
         {
             var c = GetBlockColor(5 + auraNoInArrayOfAuras, 3);
 
@@ -681,7 +684,7 @@ namespace PixelMagic.Helpers
             return 0;   
         }
         
-        public static int GetBuffStacks(string auraName)
+        public static int PlayerBuffStacks(string auraName)
         {
             var aura = SpellBook.Auras.FirstOrDefault(s => s.AuraName == auraName);
 
@@ -691,7 +694,7 @@ namespace PixelMagic.Helpers
                 return -1;
             }
 
-            return GetBuffStacks(aura.InternalAuraNo);
+            return PlayerBuffStacks(aura.InternalAuraNo);
         }
 
         public static int GetDebuffTimeRemaining(int auraNoInArrayOfAuras)
@@ -727,7 +730,7 @@ namespace PixelMagic.Helpers
             return GetDebuffTimeRemaining(aura.InternalAuraNo);
         }
 
-        public static int GetDebuffStacks(int auraNoInArrayOfAuras)
+        public static int TargetDebuffStacks(int auraNoInArrayOfAuras)
         {
             var c = GetBlockColor(auraNoInArrayOfAuras, 8);
 
@@ -747,7 +750,7 @@ namespace PixelMagic.Helpers
             return 0;
         }
 
-        public static int GetDebuffStacks(string debuffName)
+        public static int TargetDebuffStacks(string debuffName)
         {
             var aura = SpellBook.Auras.FirstOrDefault(s => s.AuraName == debuffName);
 
@@ -757,10 +760,10 @@ namespace PixelMagic.Helpers
                 return -1;
             }
 
-            return GetDebuffStacks(aura.InternalAuraNo);
+            return TargetDebuffStacks(aura.InternalAuraNo);
         }
 
-        public static int GetSpellCharges(int spellNoInArrayOfSpells)
+        public static int PlayerSpellCharges(int spellNoInArrayOfSpells)
         {
             var c = GetBlockColor(spellNoInArrayOfSpells, 9);
 
@@ -780,7 +783,7 @@ namespace PixelMagic.Helpers
             return 0;
         }
 
-        public static int GetSpellCharges(string spellName)
+        public static int PlayerSpellCharges(string spellName)
         {
             var spell = SpellBook.Spells.FirstOrDefault(s => s.SpellName == spellName);
 
@@ -790,16 +793,16 @@ namespace PixelMagic.Helpers
                 return -1;
             }
 
-            return GetSpellCharges(spell.InternalSpellNo);
+            return PlayerSpellCharges(spell.InternalSpellNo);
         }
 
-        public static bool HasBuff(int auraNoInArrayOfAuras)
+        public static bool PlayerHasBuff(int auraNoInArrayOfAuras)
         {
             var c = GetBlockColor(5 + auraNoInArrayOfAuras, 3);
             return ((c.R != 255) && (c.G != 255) && (c.B != 255));
         }
 
-        public static bool HasBuff(string buffName)
+        public static bool PlayerHasBuff(string buffName)
         {
             var aura = SpellBook.Auras.FirstOrDefault(s => s.AuraName == buffName);
 
@@ -809,10 +812,10 @@ namespace PixelMagic.Helpers
                 return false;
             }
 
-            return HasBuff(aura.InternalAuraNo);
+            return PlayerHasBuff(aura.InternalAuraNo);
         }
 
-        public static bool HasDebuff(string debuffName)
+        public static bool TargetHasDebuff(string debuffName)
         {
             var aura = SpellBook.Auras.FirstOrDefault(s => s.AuraName == debuffName);
 
@@ -822,16 +825,16 @@ namespace PixelMagic.Helpers
                 return false;
             }
 
-            return HasDebuff(aura.InternalAuraNo);
+            return TargetHasDebuff(aura.InternalAuraNo);
         }
 
-        public static bool HasDebuff(int auraNoInArrayOfAuras)
+        public static bool TargetHasDebuff(int auraNoInArrayOfAuras)
         {
             var c = GetBlockColor(auraNoInArrayOfAuras, 8);
             return ((c.R != 255) && (c.G != 255) && (c.B != 255));
         }
 
-        public static void CastSpellByName(string spellBookSpellName)
+        public static void CastSpell(string spellBookSpellName)
         {
             var spell = SpellBook.Spells.FirstOrDefault(s => s.SpellName == spellBookSpellName);
 

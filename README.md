@@ -3,7 +3,7 @@
 Developer and copyright owner: WiNiFiX<br>
 Project stated on: December 2015<br>
 
-**Last Readme Update: 2016.07.28**
+**Last Readme Update: 2018.01.09**
 
 **Latest Build:**<br>
 For those of you whom don't know how to compile the source and run it you can download this version here then unzip the<br> 

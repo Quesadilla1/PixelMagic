@@ -48,37 +48,37 @@ namespace PixelMagic.Rotation
                     {
                         if (WoW.CanCast("Tigers Fury") && WoW.Energy <= 50) // Wtf
                         {
-                            WoW.CastSpellByName("Tigers Fury");
+                            WoW.CastSpell("Tigers Fury");
                             return;
                         }
 
-                        if (WoW.CanCast("Healing Touch") && WoW.CurrentComboPoints >= 4 && WoW.HasBuff("Clearcasting") && !WoW.HasBuff("Bloodtalons")) //
+                        if (WoW.CanCast("Healing Touch") && WoW.CurrentComboPoints >= 4 && WoW.PlayerHasBuff("Clearcasting") && !WoW.PlayerHasBuff("Bloodtalons")) //
                         {
-                            WoW.CastSpellByName("Healing Touch");
+                            WoW.CastSpell("Healing Touch");
                             return;
                         }
 
                         if (WoW.CanCast("Ferocious Bite") && WoW.CurrentComboPoints >= 5 && WoW.Energy >= 50 && (WoW.TargetHealthPercent <= 25 || WoW.GetDebuffTimeRemaining("Rip") >= 10)) // 
                         {
-                            WoW.CastSpellByName("Ferocious Bite");
+                            WoW.CastSpell("Ferocious Bite");
                             return;
                         }
 
-                        if (WoW.CanCast("Rake") && WoW.Energy >= 35 && (!WoW.HasDebuff("Rake") || WoW.GetDebuffTimeRemaining("Rake") <= 3)) // Rake
+                        if (WoW.CanCast("Rake") && WoW.Energy >= 35 && (!WoW.TargetHasDebuff("Rake") || WoW.GetDebuffTimeRemaining("Rake") <= 3)) // Rake
                         {
-                            WoW.CastSpellByName("Rake");
+                            WoW.CastSpell("Rake");
                             return;
                         }
 
-                        if (WoW.CanCast("Rip") && WoW.Energy >= 30 && (!WoW.HasDebuff("Rip") || (WoW.GetDebuffTimeRemaining("Rip") <= 4.7 && WoW.CurrentComboPoints >= 5)))  // 
+                        if (WoW.CanCast("Rip") && WoW.Energy >= 30 && (!WoW.TargetHasDebuff("Rip") || (WoW.GetDebuffTimeRemaining("Rip") <= 4.7 && WoW.CurrentComboPoints >= 5)))  // 
                         {
-                            WoW.CastSpellByName("Rip");
+                            WoW.CastSpell("Rip");
                             return;
                         }
 
                         if (WoW.CanCast("Shred") && WoW.CurrentComboPoints <= 5)  // 
                         {
-                            WoW.CastSpellByName("Shred");
+                            WoW.CastSpell("Shred");
                             return;
                         }
                     }

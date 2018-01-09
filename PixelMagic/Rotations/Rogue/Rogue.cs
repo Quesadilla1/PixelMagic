@@ -11,7 +11,7 @@ using System.Windows.Forms;
 
 namespace PixelMagic.Rotation
 {
-    public class Rogue : CombatRoutine
+    public class RogueA : CombatRoutine
     {
         public override string Name
         {

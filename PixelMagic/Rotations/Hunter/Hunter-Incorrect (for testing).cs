@@ -46,19 +46,19 @@ namespace PixelMagic.Rotation
                 {
                     if (WoW.CanCast("Kill Command") && WoW.Focus >= 40) // Kill Command
                     {
-                        WoW.CastSpellByName("Kill Command");
+                        WoW.CastSpell("Kill Command");
                         return;
                     }
 
                     if (WoW.CanCast("Arcane Shot") && WoW.Focus >= 30) // Arcane Shot
                     {
-                        WoW.CastSpellByName("Arcane Shot");
+                        WoW.CastSpell("Arcane Shot");
                         return;
                     }
 
                     if (WoW.CanCast("Steady Shot")) // Steady Shot
                     {
-                        WoW.CastSpellByName("Steady Shot");
+                        WoW.CastSpell("Steady Shot");
                         Thread.Sleep(1000);
                         return;
                     }
