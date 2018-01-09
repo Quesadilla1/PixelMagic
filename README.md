@@ -46,7 +46,7 @@ This version (410) of pixel magic is open-source and anyone using or distributin
 their products open-source under no conditions may forks or copies of this product me used for sale<br>
 Anyone using / copying any part of the software must include this license<br>
 
-**Icon backlink:** [HADezign](http://hadezign.com)
-**NB: ** Rename 'PixelMagic.exe' to something else [and don't bot on an account you can't afford to lose]
+**Icon backlink:** [HADezign](http://hadezign.com)<br>
+**NB:** Rename 'PixelMagic.exe' to something else [and don't bot on an account you can't afford to lose]
 
 ---
