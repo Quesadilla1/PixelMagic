@@ -43,9 +43,7 @@ damages or other liability, whether in an action of contract, tort or otherwise,
 out of or in connection with the software or the use or other dealings in the software.<br>
 <br>
 This version (410) of pixel magic is open-source and anyone using or distributing it must keep<br>
-their products open-source under no conditions may this product me used for sale or donations<br>
-[unless those donations go to a registered charity]<br>
-<br>
+their products open-source under no conditions may forks or copies of this product me used for sale<br>
 Anyone using / copying any part of the software must include this license<br>
 
 **Icon backlink:** [HADezign](http://hadezign.com)
