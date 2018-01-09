@@ -45,8 +45,6 @@
             this.testingPixelsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.encryptCRToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.licenseAgreementToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.txtMouseXYClick = new System.Windows.Forms.TextBox();
-            this.txtMouseXY = new System.Windows.Forms.TextBox();
             this.chkDisableOverlay = new System.Windows.Forms.CheckBox();
             this.nudPulse = new System.Windows.Forms.NumericUpDown();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
@@ -57,8 +55,6 @@
             this.toolStripStatusLabel4 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel6 = new System.Windows.Forms.ToolStripStatusLabel();
             this.transparentLabel10 = new System.Windows.Forms.Label();
-            this.transparentLabel7 = new System.Windows.Forms.Label();
-            this.transparentLabel8 = new System.Windows.Forms.Label();
             this.transparentLabel6 = new System.Windows.Forms.Label();
             this.transparentLabel5 = new System.Windows.Forms.Label();
             this.txtPlayerHealth = new System.Windows.Forms.TextBox();
@@ -221,36 +217,14 @@
             // 
             // licenseAgreementToolStripMenuItem
             // 
-            this.licenseAgreementToolStripMenuItem.ForeColor = System.Drawing.Color.Black;
-            this.licenseAgreementToolStripMenuItem.Image = global::PixelMagic.GUI.Properties.Resources.Comment_16x16;
             this.licenseAgreementToolStripMenuItem.Name = "licenseAgreementToolStripMenuItem";
-            this.licenseAgreementToolStripMenuItem.Size = new System.Drawing.Size(136, 20);
-            this.licenseAgreementToolStripMenuItem.Text = "License Agreement";
-            this.licenseAgreementToolStripMenuItem.Click += new System.EventHandler(this.licenseAgreementToolStripMenuItem_Click);
-            // 
-            // txtMouseXYClick
-            // 
-            this.txtMouseXYClick.ForeColor = System.Drawing.Color.White;
-            this.txtMouseXYClick.Location = new System.Drawing.Point(895, 238);
-            this.txtMouseXYClick.Name = "txtMouseXYClick";
-            this.txtMouseXYClick.ReadOnly = true;
-            this.txtMouseXYClick.Size = new System.Drawing.Size(45, 20);
-            this.txtMouseXYClick.TabIndex = 8;
-            // 
-            // txtMouseXY
-            // 
-            this.txtMouseXY.ForeColor = System.Drawing.Color.White;
-            this.txtMouseXY.Location = new System.Drawing.Point(895, 213);
-            this.txtMouseXY.Name = "txtMouseXY";
-            this.txtMouseXY.ReadOnly = true;
-            this.txtMouseXY.Size = new System.Drawing.Size(45, 20);
-            this.txtMouseXY.TabIndex = 8;
+            this.licenseAgreementToolStripMenuItem.Size = new System.Drawing.Size(12, 4);
             // 
             // chkDisableOverlay
             // 
             this.chkDisableOverlay.AutoSize = true;
             this.chkDisableOverlay.ForeColor = System.Drawing.Color.Black;
-            this.chkDisableOverlay.Location = new System.Drawing.Point(927, 297);
+            this.chkDisableOverlay.Location = new System.Drawing.Point(927, 245);
             this.chkDisableOverlay.Name = "chkDisableOverlay";
             this.chkDisableOverlay.Size = new System.Drawing.Size(15, 14);
             this.chkDisableOverlay.TabIndex = 19;
@@ -370,31 +344,11 @@
             // transparentLabel10
             // 
             this.transparentLabel10.ForeColor = System.Drawing.Color.Black;
-            this.transparentLabel10.Location = new System.Drawing.Point(799, 297);
+            this.transparentLabel10.Location = new System.Drawing.Point(799, 245);
             this.transparentLabel10.Name = "transparentLabel10";
             this.transparentLabel10.Size = new System.Drawing.Size(85, 15);
             this.transparentLabel10.TabIndex = 39;
             this.transparentLabel10.Text = "Disable Overlay";
-            // 
-            // transparentLabel7
-            // 
-            this.transparentLabel7.AutoSize = true;
-            this.transparentLabel7.ForeColor = System.Drawing.Color.Black;
-            this.transparentLabel7.Location = new System.Drawing.Point(799, 241);
-            this.transparentLabel7.Name = "transparentLabel7";
-            this.transparentLabel7.Size = new System.Drawing.Size(52, 13);
-            this.transparentLabel7.TabIndex = 37;
-            this.transparentLabel7.Text = "Click (x,y)";
-            // 
-            // transparentLabel8
-            // 
-            this.transparentLabel8.AutoSize = true;
-            this.transparentLabel8.ForeColor = System.Drawing.Color.Black;
-            this.transparentLabel8.Location = new System.Drawing.Point(799, 216);
-            this.transparentLabel8.Name = "transparentLabel8";
-            this.transparentLabel8.Size = new System.Drawing.Size(61, 13);
-            this.transparentLabel8.TabIndex = 36;
-            this.transparentLabel8.Text = "Mouse (x,y)";
             // 
             // transparentLabel6
             // 
@@ -477,7 +431,7 @@
             // 
             this.label1.AutoSize = true;
             this.label1.ForeColor = System.Drawing.Color.Black;
-            this.label1.Location = new System.Drawing.Point(799, 267);
+            this.label1.Location = new System.Drawing.Point(799, 217);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(93, 13);
             this.label1.TabIndex = 53;
@@ -486,7 +440,7 @@
             // txtRange
             // 
             this.txtRange.ForeColor = System.Drawing.Color.White;
-            this.txtRange.Location = new System.Drawing.Point(895, 264);
+            this.txtRange.Location = new System.Drawing.Point(895, 214);
             this.txtRange.Name = "txtRange";
             this.txtRange.ReadOnly = true;
             this.txtRange.Size = new System.Drawing.Size(45, 20);
@@ -553,15 +507,11 @@
             this.Controls.Add(this.cmdClose);
             this.Controls.Add(this.txtTargetCasting);
             this.Controls.Add(this.transparentLabel10);
-            this.Controls.Add(this.transparentLabel7);
-            this.Controls.Add(this.transparentLabel8);
             this.Controls.Add(this.nudPulse);
             this.Controls.Add(this.transparentLabel6);
             this.Controls.Add(this.cmdRotationSettings);
             this.Controls.Add(this.chkDisableOverlay);
             this.Controls.Add(this.transparentLabel5);
-            this.Controls.Add(this.txtMouseXYClick);
-            this.Controls.Add(this.txtMouseXY);
             this.Controls.Add(this.cmdStartBot);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.menuStrip1);
@@ -598,9 +548,7 @@
         private System.Windows.Forms.ToolStripMenuItem setupToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem hotkeysToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem spellbookToolStripMenuItem;
-        private System.Windows.Forms.TextBox txtMouseXY;
         public System.Windows.Forms.CheckBox chkDisableOverlay;
-        private System.Windows.Forms.TextBox txtMouseXYClick;
         private System.Windows.Forms.NumericUpDown nudPulse;
         private System.Windows.Forms.ToolStripMenuItem reloadAddonToolStripMenuItem;
         private System.Windows.Forms.StatusStrip statusStrip1;
@@ -611,8 +559,6 @@
         private System.Windows.Forms.Button cmdRotationSettings;
         private System.Windows.Forms.Label transparentLabel5;
         private System.Windows.Forms.Label transparentLabel6;
-        private System.Windows.Forms.Label transparentLabel7;
-        private System.Windows.Forms.Label transparentLabel8;
         private System.Windows.Forms.Label transparentLabel10;
         private System.Windows.Forms.ToolStripMenuItem imageToByteArrayToolStripMenuItem;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel5;

@@ -97,36 +97,8 @@ namespace PixelMagic.GUI
             Shown += FrmMain_Shown;
             Log.Initialize(rtbLog, this);
 
-            Log.WritePixelMagic("Welcome to MagicPixel developed by WiNiFiX", Color.Blue);
+            Log.WritePixelMagic("Welcome to PixelMagic developed by WiNiFiX", Color.Blue);
             
-            float dx, dy;
-
-            var g = CreateGraphics();
-            try
-            {
-                dx = g.DpiX;
-                dy = g.DpiY;
-            }
-            finally
-            {
-                g.Dispose();
-            }
-
-            if (dx == dy && dx != 96)
-            {
-                Log.WriteNoTime($"DPI = {dx}");
-            }
-
-            if (dx != dy)
-            {
-                Log.WriteNoTime($"DPI (x, y) = ({dx},{dy})");
-                Log.WriteNoTime("Please ensure that DPI Scaling on X = DPI Scaling on Y Axis of monitor", Color.Red);
-            }
-            if (dx != 96)
-            {
-                Log.WriteNoTime("Please ensure that DPI Scaling is set to 96 DPI or 100%", Color.Red);
-            }
-                        
             Log.Write("Current version: " + LocalVersion);
             
             Log.WriteNoTime("To view a sample rotation see the file: " + Application.StartupPath + "\\Rotations\\DemonHunter\\Vengeance.cs", Color.Gray);
@@ -135,9 +107,9 @@ namespace PixelMagic.GUI
 
             var processName = Process.GetCurrentProcess().ProcessName.ToUpper();
 
-            if (processName == "MagicPixel")
+            if (processName == "PixelMagic")
             {
-                Log.WriteNoTime("It has been detected that you have not renamed 'MagicPixel.exe' this is not allowed.", Color.Red);
+                Log.WriteNoTime("It has been detected that you have not renamed 'PixelMagic.exe' this is not allowed.", Color.Red);
             }
 
             Log.HorizontalLine = "-".PadLeft(152, '-');
@@ -149,12 +121,6 @@ namespace PixelMagic.GUI
             try
             {
                 ConfigFile.Initialize();
-                
-                var f = new frmLicenseAgreement();
-                f.ShowDialog();
-
-                if (!ConfigFile.LicenseAccepted)
-                    Close();
 
                 chkDisableOverlay.Checked = ConfigFile.DisableOverlay;
                 chkDisableOverlay_CheckedChanged(null, null);
@@ -251,18 +217,7 @@ namespace PixelMagic.GUI
                         Log.Write($"Current WoW Resolution is '{myRect.Width - 1}x{myRect.Height - 1}' only 1920x1080 or 2560x1080 is supported", Color.Red);
                     }
                 }
-
-                var mousePos = new Thread(delegate ()
-                {
-                    while (true)
-                    {
-                        Threads.UpdateTextBox(txtMouseXY, Cursor.Position.X + "," + Cursor.Position.Y);
-                        Thread.Sleep(10);
-                    }
-                    // ReSharper disable once FunctionNeverReturns
-                })
-                { IsBackground = true };
-                mousePos.Start();
+                
 
                 Log.DrawHorizontalLine();
                 Log.Write("Please select a rotation to load from 'File' -> 'Load Rotation...'", Color.Green);
@@ -455,7 +410,6 @@ namespace PixelMagic.GUI
             hook = new KeyboardHook();
             hook.KeyPressed += Hook_KeyPressed;
 
-            MouseHook.MouseClick += MouseHook_MouseClick;
 
             if (ConfigFile.ReadValue("Hotkeys", "cmbStartRotationKey") != "")
             {
@@ -482,13 +436,6 @@ namespace PixelMagic.GUI
             hook.RegisterHotKey(Helpers.ModifierKeys.Ctrl, Keys.F5, "Reload Rotation & UI");
             hook.RegisterHotKey(Helpers.ModifierKeys.Ctrl, Keys.F6, "Reload Rotation");
         }
-
-        private void MouseHook_MouseClick(object sender, MouseEventArgs e)
-        {
-            txtMouseXYClick.Text = $"{e.X}, {e.Y}";
-        }
-
-        
 
         private void Hook_KeyPressed(object sender, KeyPressedEventArgs e)
         {
@@ -773,11 +720,7 @@ namespace PixelMagic.GUI
             Application.ExitThread();
         }
 
-        private void licenseAgreementToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            var f = new frmLicenseAgreement();
-            f.ShowDialog();
-        }
+        
 
         private void testingPixelsToolStripMenuItem_Click(object sender, EventArgs e)
         {
