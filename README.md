@@ -25,9 +25,7 @@ rotation file.
 - Legion
 
 **Sample screenshots**<br>
-![Alt Text](http://i.imgur.com/1nplBST.png)
-<br>
-![Alt Text](http://i.imgur.com/478ZRTS.png)
+![Alt Text](http://i.imgur.com/oLkqrRF.png)
 <br>
 **Sample ingame screenshot of the addon in action**
 <br>
@@ -37,8 +35,11 @@ rotation file.
 <br>
 ![Alt Text](http://i.imgur.com/xicfSBl.jpg)
 
-**How to setup your spellbook** (sample for basic hunter)<br>
-![Alt Text](http://i.imgur.com/HGhFJve.png)
+**Sample Keybindings in-game** (for Unholy DeathKnight)<br>
+![Alt Text](http://i.imgur.com/3Szujlv.jpg)
+
+**How to setup your spellbook** (sample for basic Unholy DeathKnight)<br>
+![Alt Text](http://i.imgur.com/T281wlY.png)
 
 ---
 
