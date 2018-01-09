@@ -1329,7 +1329,7 @@ namespace PixelMagic.Rotation
 [AddonDetails.db]
 AddonAuthor=Mixo
 AddonName=PixelMagic
-WoWVersion=Legion - 70100
+WoWVersion=Legion - 70300
 [SpellBook.db]
 Spell,29722,Incinerate,F6
 Spell,1454,LifeTap,R

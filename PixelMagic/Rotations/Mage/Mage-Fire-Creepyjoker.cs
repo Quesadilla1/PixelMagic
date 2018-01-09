@@ -863,7 +863,7 @@ namespace PixelMagic.Rotation
 [AddonDetails.db]
 AddonAuthor=Creepyjoker
 AddonName=Sucstobeyou
-WoWVersion=Legion - 70100
+WoWVersion=Legion - 70300
 [SpellBook.db]
 Spell,190319,Combustion,E
 Spell,198929,Cinderstorm,C

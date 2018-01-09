@@ -414,7 +414,7 @@ namespace PixelMagic.Rotation
 [AddonDetails.db]
 AddonAuthor=Toomicek
 AddonName=RGB
-WoWVersion=Legion - 70100
+WoWVersion=Legion - 70300
 [SpellBook.db]
 Spell,57994,Wind Shear,NumPad9
 Spell,196884,Feral Lunge,NumPad6

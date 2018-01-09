@@ -731,7 +731,7 @@ namespace PixelMagic.Rotation
 [AddonDetails.db]
 AddonAuthor=Mixo
 AddonName=RGB
-WoWVersion=Legion - 70100
+WoWVersion=Legion - 70300
 [SpellBook.db]
 Spell,115080,TouchOfDeath,G
 Spell,113656,FistsOfFury,F3

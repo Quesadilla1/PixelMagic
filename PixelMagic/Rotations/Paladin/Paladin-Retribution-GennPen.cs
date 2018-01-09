@@ -890,7 +890,7 @@ namespace PixelMagic.Rotation
 [AddonDetails.db]
 AddonAuthor=GennPen
 AddonName=NotePM
-WoWVersion=Legion - 70100
+WoWVersion=Legion - 70300
 [SpellBook.db]
 Spell,217020,Zeal,D1
 Spell,215661,Justicars Vengeance,D5

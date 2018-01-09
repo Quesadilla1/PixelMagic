@@ -1089,7 +1089,7 @@ namespace PixelMagic.Rotation
 [AddonDetails.db]
 AddonAuthor=smartie
 AddonName=smartie
-WoWVersion=Legion - 70100
+WoWVersion=Legion - 70300
 [SpellBook.db]
 Spell,77575,Outbreak,D1
 Spell,63560,Dark Transformation,OemOpenBrackets

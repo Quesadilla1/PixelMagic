@@ -278,7 +278,7 @@ namespace PixelMagic.Rotation.DeathKnight.DK
 [AddonDetails.db]
 AddonAuthor=Tyalieva
 AddonName=tyahelper
-WoWVersion=Legion - 70100
+WoWVersion=Legion - 70300
 [SpellBook.db]
 Spell,195182,Marrowrend,D1
 Spell,50842,Blood Boil,D2

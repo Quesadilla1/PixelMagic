@@ -941,7 +941,7 @@ namespace PixelMagic.Rotation
 [AddonDetails.db]
 AddonAuthor=FmFlex
 AddonName=smartie
-WoWVersion=Legion - 70100
+WoWVersion=Legion - 70300
 [SpellBook.db]
 Spell,49143,Frost Strike,D4
 Spell,207230,Frostscythe,NumPad8

@@ -1086,7 +1086,7 @@ namespace PixelMagic.Rotation
 [AddonDetails.db]
 AddonAuthor=Lesion
 AddonName=badgggggggggerui
-WoWVersion=Legion - 70100
+WoWVersion=Legion - 70300
 [SpellBook.db]
 Spell,203782,Shear,D1
 Spell,235964,Sever,D1

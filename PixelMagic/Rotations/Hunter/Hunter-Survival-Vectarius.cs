@@ -1125,7 +1125,7 @@ if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat)
 [AddonDetails.db]
 AddonAuthor=Vectarius
 AddonName=PixelMagic
-WoWVersion=Legion - 70100
+WoWVersion=Legion - 70300
 [SpellBook.db]
 Spell,190928,Mongoose Bite,D1
 Spell,83244,Wolf,F4

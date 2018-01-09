@@ -147,7 +147,7 @@ namespace PixelMagic.Rotation
 [AddonDetails.db]
 AddonAuthor=Vectarius
 AddonName=PixelMagic
-WoWVersion=Legion - 70100
+WoWVersion=Legion - 70300
 [SpellBook.db]
 Spell,195182,Marrowrend,D1
 Spell,50842,Blood Boil,D2

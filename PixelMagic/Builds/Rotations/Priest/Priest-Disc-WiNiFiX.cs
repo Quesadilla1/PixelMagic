@@ -44,7 +44,7 @@ namespace PixelMagic.Rotation
 [AddonDetails.db]
 AddonAuthor=WiNiFiX
 AddonName=PixelMagic
-WoWVersion=Legion - 70100
+WoWVersion=Legion - 70300
 [SpellBook.db]
 Spell,17,PWS,S
 Aura,17,PWS

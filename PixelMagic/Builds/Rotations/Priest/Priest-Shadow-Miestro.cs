@@ -315,7 +315,7 @@ namespace PixelMagic.Rotation
 [AddonDetails.db]
 AddonAuthor=Miestro
 AddonName=PixelMagic
-WoWVersion=Legion - 70100
+WoWVersion=Legion - 70300
 [SpellBook.db]
 Spell,589,Shadow Word: Pain,Q
 Spell,34914,Vampiric Touch,E

@@ -1136,7 +1136,7 @@ namespace PixelMagic.Rotation
 [AddonDetails.db]
 AddonAuthor=FmFlex
 AddonName=tyahelper
-WoWVersion=Legion - 70100
+WoWVersion=Legion - 70300
 [SpellBook.db]
 Spell,49143,Frost Strike,D1
 Spell,207230,Frostscythe,D2

@@ -433,7 +433,7 @@ namespace PixelMagic.Rotation
 [AddonDetails.db]
 AddonAuthor=Loodak
 AddonName=Fury
-WoWVersion=Legion - 70100
+WoWVersion=Legion - 70300
 [SpellBook.db]
 Spell,23881,Bloodthirst,D1
 Spell,85288,Raging Blow,D2

@@ -197,7 +197,7 @@ namespace PixelMagic.Rotation
 [AddonDetails.db]
 AddonAuthor=Nilrem
 AddonName=PixelMagic
-WoWVersion=Legion - 70100
+WoWVersion=Legion - 70300
 [SpellBook.db]
 Spell,29722,Incinerate,D1
 Spell,348,Immolate,D3

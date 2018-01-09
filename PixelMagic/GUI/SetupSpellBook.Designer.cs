@@ -132,7 +132,7 @@
             "MoP - 50400",
             "WoD - 60200",
             "Legion - 70000",
-            "Legion - 70100",
+            "Legion - 70300",
             "Legion - 70200"});
             this.cmbWowVersion.Location = new System.Drawing.Point(108, 65);
             this.cmbWowVersion.Name = "cmbWowVersion";

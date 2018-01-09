@@ -679,7 +679,7 @@ namespace PixelMagic.Rotation
 [AddonDetails.db]
 AddonAuthor=Vectarius
 AddonName=myspellpriority
-WoWVersion=Legion - 70100
+WoWVersion=Legion - 70300
 [SpellBook.db]
 Spell,83245,Wolf,F1
 Spell,120679,Dire Beast,D1

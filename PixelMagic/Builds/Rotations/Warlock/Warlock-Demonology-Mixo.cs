@@ -813,7 +813,7 @@ namespace PixelMagic.Rotation
 [AddonDetails.db]
 AddonAuthor=Mixo
 AddonName=Kontrol
-WoWVersion=Legion - 70100
+WoWVersion=Legion - 70300
 [SpellBook.db]
 Spell,157695,Demonbolt,F6
 Spell,686,Shadowbolt,F6

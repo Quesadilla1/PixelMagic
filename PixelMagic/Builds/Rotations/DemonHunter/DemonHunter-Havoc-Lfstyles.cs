@@ -168,7 +168,7 @@ namespace PixelMagic.Rotation
 [AddonDetails.db]
 AddonAuthor=Zanrub(Lfstyles Edit)
 AddonName=RGB
-WoWVersion=Legion - 70100
+WoWVersion=Legion - 70300
 [SpellBook.db]
 Spell,198013,Eye Beam,D4
 Spell,195072,Fel Rush,D1

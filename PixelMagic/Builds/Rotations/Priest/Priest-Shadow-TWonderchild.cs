@@ -641,7 +641,7 @@ namespace PixelMagic.Rotation
 [AddonDetails.db]
 AddonAuthor=TWonderchild
 AddonName=Pawner
-WoWVersion=Legion - 70100
+WoWVersion=Legion - 70300
 [SpellBook.db]
 Spell,232698,Shadowform,NumPad9
 Spell,34914,Vampiric Touch,D1

@@ -148,7 +148,7 @@ namespace PixelMagic.Rotation
 [AddonDetails.db]
 AddonAuthor=Dupe-aka-Lesion
 AddonName=PixelMagic
-WoWVersion=Legion - 70100
+WoWVersion=Legion - 70300
 [SpellBook.db]
 Spell,11426,Ice Barrier,S
 Spell,205022,Arcane Familiar,D6

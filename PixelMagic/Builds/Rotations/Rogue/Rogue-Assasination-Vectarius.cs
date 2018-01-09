@@ -151,7 +151,7 @@ namespace PixelMagic.Rotation
 [AddonDetails.db]
 AddonAuthor=Vectarius
 AddonName=PMx
-WoWVersion=Legion - 70100
+WoWVersion=Legion - 70300
 [SpellBook.db]
 Spell,1943,Rupture,D2
 Spell,79140,Vendetta,D6

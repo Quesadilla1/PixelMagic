@@ -218,7 +218,7 @@ namespace PixelMagic.Rotation
 [AddonDetails.db]
 AddonAuthor=Zanrub
 AddonName=PixelMagic
-WoWVersion=Legion - 70100
+WoWVersion=Legion - 70300
 [SpellBook.db]
 Spell,185438,Shadowstrike,D2
 Spell,196819,Eviscerate,D3

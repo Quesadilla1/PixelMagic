@@ -195,7 +195,7 @@ namespace PixelMagic.Rotation
 [AddonDetails.db]
 AddonAuthor=Toomicek
 AddonName=PixelMagic
-WoWVersion=Legion - 70100
+WoWVersion=Legion - 70300
 [SpellBook.db]  
 Spell,188389,Flame Shock,D3
 Spell,108271,Astral Shift,D6

@@ -171,7 +171,7 @@ namespace PixelMagic.Rotation
 [AddonDetails.db]
 AddonAuthor=BrewDrinkCode
 AddonName=PixelMagic
-WoWVersion=Legion - 70100
+WoWVersion=Legion - 70300
 [SpellBook.db]
 Spell,121253,Keg Smash,D1
 Spell,115181,Breath of Fire,D2

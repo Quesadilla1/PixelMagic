@@ -485,7 +485,7 @@ namespace PixelMagic.Rotation
 [AddonDetails.db]
 AddonAuthor=Sorcerer
 AddonName=PixelMagic
-WoWVersion=Legion - 70100
+WoWVersion=Legion - 70300
 [SpellBook.db]
 Spell,980,Agony,NumPad1
 Spell,63106,Siphon Life,NumPad2

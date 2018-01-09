@@ -182,7 +182,7 @@ namespace PixelMagic.Rotation
 [AddonDetails.db]
 AddonAuthor=Dupe
 AddonName=PixelMagic
-WoWVersion=Legion - 70100
+WoWVersion=Legion - 70300
 [SpellBook.db]
 Spell,12294,Mortal Strike,D1
 Spell,167105,Colossus Smash,D2

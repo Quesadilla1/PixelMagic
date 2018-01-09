@@ -1085,7 +1085,7 @@ namespace PixelMagic.Rotation
 [AddonDetails.db]
 AddonAuthor=Creepyjoker
 AddonName=Sucstobeyou
-WoWVersion=Legion - 70100
+WoWVersion=Legion - 70300
 [SpellBook.db]
 Spell,137619,Marked for Death,F
 Spell,13877,Blade Flurry,D0

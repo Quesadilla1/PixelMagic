@@ -381,7 +381,7 @@ namespace PixelMagic.Rotation
 [AddonDetails.db]
 AddonAuthor=Nilrem-aka-Dova
 AddonName=RGB
-WoWVersion=Legion - 70100
+WoWVersion=Legion - 70300
 [SpellBook.db]
 Spell,157695,Demonbolt,D2
 Spell,193440,Demonwrath,D8

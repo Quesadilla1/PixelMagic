@@ -137,7 +137,7 @@ namespace PixelMagic.Rotation
 [AddonDetails.db]
 AddonAuthor=Vectarius
 AddonName=PixelMagic
-WoWVersion=Legion - 70100
+WoWVersion=Legion - 70300
 [SpellBook.db]
 Spell,49143,Frost Strike,D1
 Spell,207256,Obliteration,D2

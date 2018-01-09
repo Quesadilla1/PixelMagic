@@ -348,7 +348,7 @@ namespace PixelMagic.Rotation
 [AddonDetails.db]
 AddonAuthor=Jedix
 AddonName=Pawn
-WoWVersion=Legion - 70100
+WoWVersion=Legion - 70300
 [SpellBook.db]
 Spell,203782,Shear,G
 Spell,235964,Sever,G
