@@ -342,7 +342,6 @@
     <None Include="Resources\help.png" />
     <None Include="Resources\Close_16x16.png" />
     <None Include="Resources\Register.png" />
-    <Content Include="FodyWeavers.xml" />
     <Content Include="Hadezign-Hobbies-Magic.ico" />
     <None Include="Resources\pm.png" />
     <None Include="Resources\Discord-Logo-White.png" />

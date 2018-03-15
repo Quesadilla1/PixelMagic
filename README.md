@@ -11,7 +11,8 @@ the application "PixelMagic.exe"<br>
 ---
 
 **Website for FAQ:** [here](http://www.ownedcore.com/forums/world-of-warcraft/world-of-warcraft-bots-programs/wow-bots-questions-requests/542750-pixel-based-bot.html)<br>
-*Instructions on how to use / test / build this version are on Discord along with support*
+*Instructions on how to use / test / build this version are on Slack along with support*<br><br>
+**Slack Chat:** [here](winifix.slack.com)<br>
 
 **Currently supports WoW Versions**
 - Legion
